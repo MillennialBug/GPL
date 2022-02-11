@@ -12,14 +12,44 @@ namespace GraphicalProgrammingLanguage
 {
     public partial class Form1 : Form
     {
+        const int PaintingBitmapWidth = 1240;
+        const int PaintingBitmapHeight = 1240;
+
+        Bitmap PaintingBitmap = new Bitmap(PaintingBitmapWidth, PaintingBitmapHeight);
+        Canvas PaintingCanvas;
+
         public Form1()
         {
             InitializeComponent();
+            PaintingCanvas = new Canvas(Graphics.FromImage(PaintingBitmap));
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void pictureBox_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            g.DrawImageUnscaled(PaintingBitmap, 0, 0);
+        }
+
+        private void CommandBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                String Command = CommandBox.Text.Trim().ToLower();
+                if (Command.Equals("line") == true)
+                {
+                    PaintingCanvas.DrawLine(200, 200);
+                    Console.WriteLine("Line");
+                }
+
+                CommandBox.Text = "";
+                Refresh();
+            }
+            
         }
     }
 }
