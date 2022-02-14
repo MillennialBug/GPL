@@ -23,6 +23,8 @@ namespace GraphicalProgrammingLanguage
             this.g = g;
         }
 
+        public Graphics GetGraphics() { return g; }
+
         public void DrawLine(int ToX, int ToY)
         {
             this.g.DrawLine(Pen, XPos, YPos, ToX, ToY);

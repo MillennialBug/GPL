@@ -17,11 +17,15 @@ namespace GraphicalProgrammingLanguage
 
         Bitmap PaintingBitmap = new Bitmap(PaintingBitmapWidth, PaintingBitmapHeight);
         Canvas PaintingCanvas;
+        ShapeFactory ShapeFactory;
+        Graphics g;
 
         public Form1()
         {
             InitializeComponent();
             PaintingCanvas = new Canvas(Graphics.FromImage(PaintingBitmap));
+            this.g = PaintingCanvas.GetGraphics();
+            this.ShapeFactory = new ShapeFactory();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -44,6 +48,13 @@ namespace GraphicalProgrammingLanguage
                 {
                     PaintingCanvas.DrawLine(200, 200);
                     Console.WriteLine("Line");
+                }
+                else if (Command.Equals("circle") == true)
+                {
+                    Shape s = (Shape) this.ShapeFactory.getShape(Command);
+                    s.Set(Color.Red, 50, 50, 100);
+                    s.Draw(this.g);
+
                 }
 
                 CommandBox.Text = "";
