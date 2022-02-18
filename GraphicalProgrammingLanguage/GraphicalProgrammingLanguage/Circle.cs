@@ -9,7 +9,7 @@ namespace GraphicalProgrammingLanguage
 {
     internal class Circle : Shape
     {
-        protected int size;
+        protected int diameter;
 
         public Circle() { }
 
@@ -18,12 +18,12 @@ namespace GraphicalProgrammingLanguage
             this.colour = colour;
             this.XPos = parameters[0];
             this.YPos = parameters[1];
-            this.size = parameters[2];
+            this.diameter = parameters[2];
         }
 
         override public void Draw(Graphics g)
         {
-            g.DrawEllipse(new Pen(this.colour),new Rectangle(this.XPos, this.YPos, this.size, this.size));
+            g.DrawEllipse(new Pen(this.colour),new Rectangle(this.XPos, this.YPos, this.diameter, this.diameter));
         }
     }
 }
