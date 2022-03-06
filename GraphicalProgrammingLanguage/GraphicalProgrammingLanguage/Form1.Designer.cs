@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.programBox = new System.Windows.Forms.TextBox();
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.CommandBox = new System.Windows.Forms.TextBox();
             this.run_button = new System.Windows.Forms.Button();
@@ -38,14 +38,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // textBox1
+            // programBox
             // 
-            this.textBox1.AcceptsReturn = true;
-            this.textBox1.Location = new System.Drawing.Point(12, 12);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(360, 851);
-            this.textBox1.TabIndex = 0;
+            this.programBox.AcceptsReturn = true;
+            this.programBox.Location = new System.Drawing.Point(12, 12);
+            this.programBox.Multiline = true;
+            this.programBox.Name = "programBox";
+            this.programBox.Size = new System.Drawing.Size(360, 851);
+            this.programBox.TabIndex = 0;
+            this.programBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox1_KeyDown);
             // 
             // pictureBox
             // 
@@ -114,7 +115,7 @@
             this.Controls.Add(this.run_button);
             this.Controls.Add(this.CommandBox);
             this.Controls.Add(this.pictureBox);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.programBox);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
@@ -125,7 +126,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox programBox;
         private System.Windows.Forms.PictureBox pictureBox;
         private System.Windows.Forms.TextBox CommandBox;
         private System.Windows.Forms.Button run_button;

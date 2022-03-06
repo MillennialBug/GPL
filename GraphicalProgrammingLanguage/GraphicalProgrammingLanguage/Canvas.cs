@@ -31,5 +31,14 @@ namespace GraphicalProgrammingLanguage
             this.XPos = ToX;
             this.YPos = ToY;
         }
+
+        public void DrawShape(Shape shape, List<int> args)
+        {
+            args.Add(XPos);
+            args.Add(YPos);
+            shape.Set(Color.AliceBlue, args.ToArray());
+            shape.Draw(this.g);
+            
+        }
     }
 }

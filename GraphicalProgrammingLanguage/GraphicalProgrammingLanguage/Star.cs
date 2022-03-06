@@ -43,7 +43,7 @@ namespace GraphicalProgrammingLanguage
 			 * The % calculations mean we avoid any ArrayOutOfBounds exceptions.
 			 */
 			int point = 0;
-			for (int i = 0; i < n; i++)
+			for (int i = 0; i < this.sides; i++)
 			{
 				this.points[point++] = new Point(outerPoints[i].X, outerPoints[i].Y);
 				int j = (int)((Math.Ceiling(this.sides / 2.0)) + i) % this.sides;

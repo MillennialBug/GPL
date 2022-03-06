@@ -16,9 +16,9 @@ namespace GraphicalProgrammingLanguage
         override public void Set(Color colour, params int[] parameters)
         {
             this.colour = colour;
-            this.XPos = parameters[0];
-            this.YPos = parameters[1];
-            this.diameter = parameters[2];
+            this.diameter = parameters[0];
+            this.XPos = parameters[1];
+            this.YPos = parameters[2];
         }
 
         override public void Draw(Graphics g)
