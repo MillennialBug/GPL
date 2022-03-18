@@ -46,20 +46,7 @@ namespace GraphicalProgrammingLanguage
         {
             if (e.KeyCode == Keys.Enter)
             {
-                String Command = CommandBox.Text.Trim().ToLower();
-                if (Command.Equals("line") == true)
-                {
-                    PaintingCanvas.DrawLine(200, 200);
-                    Console.WriteLine("Line");
-                }
-                else if (Command.Equals("circle") == true)
-                {
-                    Shape s = (Shape) this.ShapeFactory.getShape(Command);
-                    s.Set(Color.Red, 50, 50, 100);
-                    s.Draw(this.g);
-
-                }
-
+                parser.parseLines(CommandBox.Lines);
                 CommandBox.Text = "";
                 Refresh();
             }

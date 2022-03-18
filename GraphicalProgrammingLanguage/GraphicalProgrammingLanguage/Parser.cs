@@ -35,6 +35,7 @@ namespace GraphicalProgrammingLanguage
                         List<int> args = new List<int>();
                         foreach(String s in strArgs)
                         {
+                            // For variables this will need changing.
                             int tmp;
                             int.TryParse(s, out tmp );
                             args.Add(tmp);
@@ -42,7 +43,7 @@ namespace GraphicalProgrammingLanguage
                         c.DrawShape(shapeFactory.getShape(parts[0]), args);
                     }
 
-                } catch (Exception e)
+                } catch (GPLException e)
                 {
                     Console.WriteLine(e.Message);
                 }

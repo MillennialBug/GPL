@@ -23,7 +23,7 @@ namespace GraphicalProgrammingLanguage
 
         override public void Draw(Graphics g)
         {
-            g.DrawEllipse(new Pen(this.colour),new Rectangle(this.XPos, this.YPos, this.diameter, this.diameter));
+            g.DrawEllipse(new Pen(this.colour),new System.Drawing.Rectangle(this.XPos - (this.diameter/2), this.YPos - (this.diameter / 2), this.diameter, this.diameter));
         }
     }
 }

@@ -14,10 +14,13 @@ namespace GraphicalProgrammingLanguage
             {
                 return new Circle();
             }
+            else if (name.Equals("rectangle"))
+            {
+                return new Rectangle();
+            }
             else 
             {
-                Console.WriteLine("Dropped into else.");
-                return new Circle();
+                throw new GPLException("Shape '" + name + "' not found.");
             }
         }
         

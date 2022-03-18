@@ -36,7 +36,7 @@ namespace GraphicalProgrammingLanguage
         {
             args.Add(XPos);
             args.Add(YPos);
-            shape.Set(Color.AliceBlue, args.ToArray());
+            shape.Set(Color.Black, args.ToArray());
             shape.Draw(this.g);
             
         }

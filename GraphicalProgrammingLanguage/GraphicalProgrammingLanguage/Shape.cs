@@ -12,9 +12,7 @@ namespace GraphicalProgrammingLanguage
         protected int XPos, YPos;
         protected Color colour;
 
-        public Shape()
-        {
-        }
+        public Shape() { }
 
         abstract public void Set(Color colour, params int[] parameters);
 

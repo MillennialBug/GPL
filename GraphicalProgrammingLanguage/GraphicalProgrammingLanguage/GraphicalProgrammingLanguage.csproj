@@ -49,8 +49,10 @@
   <ItemGroup>
     <Compile Include="Canvas.cs" />
     <Compile Include="Circle.cs" />
+    <Compile Include="GPLException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Polygon.cs" />
+    <Compile Include="Rectangle.cs" />
     <Compile Include="ShapeInterface.cs" />
     <Compile Include="Shape.cs" />
     <Compile Include="ShapeFactory.cs" />
