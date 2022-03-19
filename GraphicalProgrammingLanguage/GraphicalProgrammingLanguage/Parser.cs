@@ -27,20 +27,54 @@ namespace GraphicalProgrammingLanguage
                 String[] parts = line.Trim(' ').Split(' ');
                 try
                 {
+                    List<int> args;
                     validator.validateCommand(parts);
 
                     if (validator.isShape(parts[0]))
                     {
-                        String[] strArgs = parts[1].Split(',');
-                        List<int> args = new List<int>();
-                        foreach(String s in strArgs)
-                        {
-                            // For variables this will need changing.
-                            int tmp;
-                            int.TryParse(s, out tmp );
-                            args.Add(tmp);
-                        }
+                        args = this.GetIntArgs(parts[1]);
                         c.DrawShape(shapeFactory.getShape(parts[0]), args);
+                    }
+                    else
+                    {
+                        switch(parts[0]) {
+                            case "clear":
+                                c.Clear();
+                                break;
+                            case "reset":
+                                c.Reset();
+                                break;
+                            case "moveto":
+                                args = this.GetIntArgs(parts[1]);
+                                c.MoveCursor(args);
+                                break;
+                            case "drawto":
+                                args = this.GetIntArgs(parts[1]);
+                                c.DrawLine(args);
+                                break;
+                            case "pen":
+                                try
+                                {
+                                    c.SetColor(ColorTranslator.FromHtml(parts[1]));
+                                }
+                                catch(Exception e)
+                                {
+                                    if(e.Message.Equals("htmlColor is not a valid HTML color name."))
+                                    {
+                                        throw new GPLException(e.Message);
+                                    }
+                                    else
+                                    {
+                                        throw e;
+                                    }
+                                }
+                                break;
+                            case "fill":
+                                c.SetFill(parts[1]);
+                                break;
+                            default:
+                                throw new GPLException("Unknown command '" + parts[0] + "' found.");
+                        }
                     }
 
                 } catch (GPLException e)
@@ -49,6 +83,20 @@ namespace GraphicalProgrammingLanguage
                 }
 
             }
+        }
+
+        public List<int> GetIntArgs(String argsIn)
+        {
+            String[] strArgs = argsIn.Split(',');
+            List<int> args = new List<int>();
+            foreach (String s in strArgs)
+            {
+                // For variables this will need changing.
+                int tmp;
+                int.TryParse(s, out tmp);
+                args.Add(tmp);
+            }
+            return args;
         }
 
         

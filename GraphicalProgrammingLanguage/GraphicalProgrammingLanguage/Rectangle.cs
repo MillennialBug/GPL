@@ -14,18 +14,25 @@ namespace GraphicalProgrammingLanguage
 
         public Rectangle() { }
 
-        override public void Set(Color colour, params int[] parameters)
+        override public void Set(Color color, params int[] parameters)
         {
-            this.colour = colour;
+            this.color = color;
             this.width = parameters[0];
             this.height = parameters[1];
-            this.XPos = parameters[2];
-            this.YPos = parameters[3];
+            this.xPos = parameters[2];
+            this.yPos = parameters[3];
         }
 
-        override public void Draw(Graphics g)
+        override public void Draw(Graphics g, Boolean fill)
         {
-            g.DrawRectangle(new Pen(this.colour), new System.Drawing.Rectangle(this.XPos - (this.width/2), this.YPos - (this.height/2), this.width, this.height));
+            if (!fill)
+            {
+                g.DrawRectangle(new Pen(this.color), new System.Drawing.Rectangle(this.xPos - (this.width / 2), this.yPos - (this.height / 2), this.width, this.height));
+            }
+            else
+            {
+                g.FillRectangle(new SolidBrush(this.color), new System.Drawing.Rectangle(this.xPos - (this.width / 2), this.yPos - (this.height / 2), this.width, this.height));
+            }
         }
     }
 }

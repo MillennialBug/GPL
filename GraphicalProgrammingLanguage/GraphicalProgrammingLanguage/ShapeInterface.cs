@@ -9,7 +9,7 @@ namespace GraphicalProgrammingLanguage
 {
     internal interface ShapeInterface
     {
-        void Set(Color colour, params int[] parameters);
-        void Draw(Graphics g);
+        void Set(Color color, params int[] parameters);
+        void Draw(Graphics g, Boolean fill);
     }
 }

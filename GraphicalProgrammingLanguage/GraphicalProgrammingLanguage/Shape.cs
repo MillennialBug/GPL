@@ -9,14 +9,14 @@ namespace GraphicalProgrammingLanguage
 {
     abstract internal class Shape : ShapeInterface
     {
-        protected int XPos, YPos;
-        protected Color colour;
+        protected int xPos, yPos;
+        protected Color color;
 
         public Shape() { }
 
-        abstract public void Set(Color colour, params int[] parameters);
+        abstract public void Set(Color color, params int[] parameters);
 
-        abstract public void Draw(Graphics g);
+        abstract public void Draw(Graphics g, Boolean fill);
 
     }
 }

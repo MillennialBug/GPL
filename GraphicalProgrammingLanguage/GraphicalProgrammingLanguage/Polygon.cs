@@ -18,9 +18,9 @@ namespace GraphicalProgrammingLanguage
 
         override public void Set(Color colour, params int[] parameters)
         {
-            this.colour = colour;
-            this.XPos = parameters[0];
-            this.YPos = parameters[1];
+            this.color = colour;
+            this.xPos = parameters[0];
+            this.yPos = parameters[1];
             this.sides = parameters[2];
             this.width = parameters[3];
             this.upsideDown = parameters[4];
@@ -32,19 +32,27 @@ namespace GraphicalProgrammingLanguage
                 if (upsideDown == 1)
                 {
                     //For an odd n sided polygon, this will put the odd vertex at the bottom.
-                    points[i] = new Point((int)Math.Round((this.XPos + this.width * Math.Sin(2 * Math.PI * i / this.sides))), (int)Math.Round((this.YPos + this.width * Math.Cos(2 * Math.PI * i / this.sides))));
+                    points[i] = new Point((int)Math.Round((this.xPos + this.width * Math.Sin(2 * Math.PI * i / this.sides))), (int)Math.Round((this.yPos + this.width * Math.Cos(2 * Math.PI * i / this.sides))));
                 }
                 else
                 {
                     //For an odd n sided polygon, this will put the odd vertex at the top.
-                    points[i] = new Point((int)Math.Round((this.XPos - this.width * Math.Sin(2 * Math.PI * i / this.sides))), (int)Math.Round((this.YPos - this.width * Math.Cos(2 * Math.PI * i / this.sides))));
+                    points[i] = new Point((int)Math.Round((this.xPos - this.width * Math.Sin(2 * Math.PI * i / this.sides))), (int)Math.Round((this.yPos - this.width * Math.Cos(2 * Math.PI * i / this.sides))));
                 }
             }
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(Graphics g, Boolean fill)
         {
-            g.DrawPolygon(new Pen(this.colour), this.points);
+            if (!fill)
+            {
+                g.DrawPolygon(new Pen(this.color), this.points);
+            }
+            else
+            {
+                g.FillPolygon(new SolidBrush(this.color), this.points);
+            }
+            
         }
 
         public Point[] GetPoints() { return this.points; }

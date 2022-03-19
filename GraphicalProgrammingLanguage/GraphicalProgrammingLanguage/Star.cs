@@ -23,11 +23,11 @@ namespace GraphicalProgrammingLanguage
         {
 			int[] params1 = new int[] { parameters[0], parameters[1], parameters[2], parameters[3], 0 };
 			outer = new Polygon();
-			outer.Set(this.colour, params1);
+			outer.Set(this.color, params1);
 			outerPoints = outer.GetPoints();
 			int[] params2 = new int[] { parameters[0], parameters[1], parameters[2], parameters[3] / 2, 1 };
 			inner = new Polygon();
-			inner.Set(this.colour, params2);
+			inner.Set(this.color, params2);
 			innerPoints = inner.GetPoints();
 			Polygon star = new Polygon();
 			points = new Point[this.sides];
@@ -56,9 +56,16 @@ namespace GraphicalProgrammingLanguage
 			}
 		}
 
-        public override void Draw(Graphics g)
+        public override void Draw(Graphics g, Boolean fill)
         {
-			g.DrawPolygon(new Pen(this.colour), this.points);
+            if (!fill)
+            {
+				g.DrawPolygon(new Pen(this.color), this.points);
+			}
+            else
+            {
+				g.FillPolygon(new SolidBrush(this.color), this.points);
+            }
         }
     }
 }
