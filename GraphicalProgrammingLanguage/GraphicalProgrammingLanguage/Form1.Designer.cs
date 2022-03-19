@@ -53,16 +53,16 @@
             this.pictureBox.BackColor = System.Drawing.SystemColors.Window;
             this.pictureBox.Location = new System.Drawing.Point(775, 12);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(1240, 1240);
+            this.pictureBox.Size = new System.Drawing.Size(1000, 1000);
             this.pictureBox.TabIndex = 1;
             this.pictureBox.TabStop = false;
             this.pictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_Paint);
             // 
             // CommandBox
             // 
-            this.CommandBox.Location = new System.Drawing.Point(12, 1201);
+            this.CommandBox.Location = new System.Drawing.Point(12, 979);
             this.CommandBox.Name = "CommandBox";
-            this.CommandBox.Size = new System.Drawing.Size(288, 26);
+            this.CommandBox.Size = new System.Drawing.Size(365, 26);
             this.CommandBox.TabIndex = 2;
             this.CommandBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CommandBox_KeyDown);
             // 
@@ -108,7 +108,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Info;
-            this.ClientSize = new System.Drawing.Size(2027, 1264);
+            this.ClientSize = new System.Drawing.Size(1787, 1022);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.load_button);
             this.Controls.Add(this.save_button);

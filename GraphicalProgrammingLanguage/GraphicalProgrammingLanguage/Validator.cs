@@ -10,7 +10,10 @@ namespace GraphicalProgrammingLanguage
 {
     internal class Validator
     {
-        private Dictionary<String, Regex> validCommands = new Dictionary<String, Regex>() { { "circle", new Regex("^\\d*$") }, { "rectangle", new Regex("^\\d*,\\d*$")}, { "fill", new Regex("^on|off$") } };
+        private Dictionary<String, Regex> validCommands = new Dictionary<String, Regex>() { { "circle", new Regex("^\\d*$") }, 
+                                                                                            { "rectangle", new Regex("^\\d*,\\d*$")}, 
+                                                                                            { "fill", new Regex("^on|off$") }, 
+                                                                                            { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") } };
         private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle"};
         private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill"};
 
@@ -46,11 +49,6 @@ namespace GraphicalProgrammingLanguage
         public bool isShape(String cmd)
         {
             return shapes.Contains(cmd);
-        }
-
-        public bool isCommand(String cmd) 
-        {
-            return commands.Contains(cmd);
         }
     }
 }

@@ -77,5 +77,13 @@ namespace GraphicalProgrammingLanguage
                 fill = false;
             }
         }
+
+        public void RestoreDefaultState()
+        {
+            this.SetFill("off");
+            this.pen = new Pen(Color.Black, DEFAULT_PEN_WIDTH);
+            this.Reset();
+            this.Clear();
+        }
     }
 }

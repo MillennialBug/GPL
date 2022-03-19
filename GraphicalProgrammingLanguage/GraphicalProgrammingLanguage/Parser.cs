@@ -59,9 +59,9 @@ namespace GraphicalProgrammingLanguage
                                 }
                                 catch(Exception e)
                                 {
-                                    if(e.Message.Equals("htmlColor is not a valid HTML color name."))
+                                    if(e.Message.Equals(parts[1] + " is not a valid value for Int32.") || e.Message.Equals("Could not find any recognizable digits."))
                                     {
-                                        throw new GPLException(e.Message);
+                                        throw new GPLException(parts[1] + " is not a valid color name or hex.");
                                     }
                                     else
                                     {

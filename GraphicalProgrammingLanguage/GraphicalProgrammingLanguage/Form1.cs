@@ -15,23 +15,24 @@ namespace GraphicalProgrammingLanguage
         const int PaintingBitmapWidth = 1240;
         const int PaintingBitmapHeight = 1240;
 
-        Bitmap PaintingBitmap = new Bitmap(PaintingBitmapWidth, PaintingBitmapHeight);
-        Canvas PaintingCanvas;
-        ShapeFactory ShapeFactory;
+        Bitmap paintingBitmap = new Bitmap(PaintingBitmapWidth, PaintingBitmapHeight);
+        Canvas paintingCanvas;
+        ShapeFactory shapeFactory;
         Graphics g;
         Parser parser;
 
         public Form1()
         {
             InitializeComponent();
-            PaintingCanvas = new Canvas(Graphics.FromImage(PaintingBitmap));
-            this.g = PaintingCanvas.GetGraphics();
-            this.ShapeFactory = new ShapeFactory();
-            parser = new Parser(PaintingCanvas);
+            paintingCanvas = new Canvas(Graphics.FromImage(paintingBitmap));
+            this.g = paintingCanvas.GetGraphics();
+            this.shapeFactory = new ShapeFactory();
+            parser = new Parser(paintingCanvas);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            paintingCanvas.RestoreDefaultState();
             parser.parseLines(programBox.Lines);
             Refresh();
         }
@@ -39,7 +40,7 @@ namespace GraphicalProgrammingLanguage
         private void pictureBox_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            g.DrawImageUnscaled(PaintingBitmap, 0, 0);
+            g.DrawImageUnscaled(paintingBitmap, 0, 0);
         }
 
         private void CommandBox_KeyDown(object sender, KeyEventArgs e)
