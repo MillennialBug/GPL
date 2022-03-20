@@ -33,7 +33,7 @@ namespace GraphicalProgrammingLanguage
                     exceptions.Add("");
                     continue;
                 }
-                String[] parts = line.Split(' ');
+                String[] parts = line.Trim(' ').Split(' ');
                 String command = parts[0];
                 String strArguments = "";
                 if (parts.Length > 1) strArguments = parts[1];
