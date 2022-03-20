@@ -19,12 +19,12 @@ namespace GraphicalProgrammingLanguage
         override public void Set(Color colour, params int[] parameters)
         {
             this.color = colour;
-            this.xPos = parameters[0];
-            this.yPos = parameters[1];
-            this.sides = parameters[2];
-            this.width = parameters[3];
-            this.upsideDown = parameters[4];
-            this.points = new Point[sides];
+            this.sides = parameters[0];
+            this.width = parameters[1];
+            this.upsideDown = parameters[2];
+            this.xPos = parameters[3];
+            this.yPos = parameters[4];
+            this.points = new Point[this.sides];
 
             for (int i = 0; i < this.sides; i++)
             {

@@ -13,24 +13,24 @@ namespace GraphicalProgrammingLanguage
 		protected Point[] innerPoints;
         protected Polygon outer;
 		protected Point[] outerPoints;
-		protected int sides;
-		protected int width;
 		protected Point[] points;
+		protected int sides;
 
         public Star() { }
 
-        public override void Set(Color colour, params int[] parameters)
+        public override void Set(Color color, params int[] parameters)
         {
-			int[] params1 = new int[] { parameters[0], parameters[1], parameters[2], parameters[3], 0 };
+			this.sides = parameters[0];
+			this.color = color;
+			int[] params1 = new int[] { parameters[0], parameters[1], 0, parameters[2], parameters[3] };
 			outer = new Polygon();
 			outer.Set(this.color, params1);
 			outerPoints = outer.GetPoints();
-			int[] params2 = new int[] { parameters[0], parameters[1], parameters[2], parameters[3] / 2, 1 };
+			int[] params2 = new int[] { parameters[0], parameters[1] / 2, 1, parameters[2], parameters[3] };
 			inner = new Polygon();
 			inner.Set(this.color, params2);
 			innerPoints = inner.GetPoints();
-			Polygon star = new Polygon();
-			points = new Point[this.sides];
+			points = new Point[this.sides*2];
 			/*
 			 * This took a while to figure out.
 			 * Polygons are drawn from their odds point (for odd n) anti clockwise.

@@ -28,11 +28,13 @@ namespace GraphicalProgrammingLanguage
                 try
                 {
                     List<int> args;
-                    validator.validateCommand(parts);
+                    validator.ValidateCommand(parts);
 
-                    if (validator.isShape(parts[0]))
+                    if (validator.IsShape(parts[0]))
                     {
                         args = this.GetIntArgs(parts[1]);
+                        if (parts[0].Equals("polygon") || parts[0].Equals("star")) validator.ValidatePolygon(parts[0], args);
+                        if(parts[0].Equals("polygon")) args.Add(0); //Add upsideDown parameter which is not currently user defined.
                         c.DrawShape(shapeFactory.getShape(parts[0]), args);
                     }
                     else

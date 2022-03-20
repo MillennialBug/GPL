@@ -40,7 +40,7 @@ namespace GraphicalProgrammingLanguage
         {
             args.Add(xPos);
             args.Add(yPos);
-            shape.Set(Color.Black, args.ToArray());
+            shape.Set(this.color, args.ToArray());
             shape.Draw(this.g, fill);
         }
 
@@ -63,7 +63,8 @@ namespace GraphicalProgrammingLanguage
 
         public void SetColor(Color color)
         {
-            this.pen = new Pen(color);
+            this.color = color;
+            this.pen = new Pen(this.color);
         }
 
         public void SetFill(String state)

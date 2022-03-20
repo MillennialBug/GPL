@@ -13,11 +13,16 @@ namespace GraphicalProgrammingLanguage
         private Dictionary<String, Regex> validCommands = new Dictionary<String, Regex>() { { "circle", new Regex("^\\d*$") }, 
                                                                                             { "rectangle", new Regex("^\\d*,\\d*$")}, 
                                                                                             { "fill", new Regex("^on|off$") }, 
-                                                                                            { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") } };
-        private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle"};
+                                                                                            { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") },
+                                                                                            { "triangle", new Regex("^\\d*$") },
+                                                                                            { "star", new Regex("^\\d*,\\d*$")},
+                                                                                            { "square", new Regex("^\\d*$")},
+                                                                                            { "polygon", new Regex("^\\d*,\\d*$")}
+                                                                                          };
+        private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
         private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill"};
 
-        public void validateCommand(String[] cmd)
+        public void ValidateCommand(String[] cmd)
         {
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]))
             {
@@ -30,11 +35,11 @@ namespace GraphicalProgrammingLanguage
             }
 
             String[] args = new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>();
-            validateArgs(cmd[0], args);
+            ValidateArgs(cmd[0], args);
 
         }
 
-        private void validateArgs(String cmd, String[] args)
+        private void ValidateArgs(String cmd, String[] args)
         {
             Regex pattern;
             if (validCommands.TryGetValue(cmd, out pattern))
@@ -46,7 +51,12 @@ namespace GraphicalProgrammingLanguage
             }
         }
 
-        public bool isShape(String cmd)
+        public void ValidatePolygon(String shape, List<int> args)
+        {
+            if (args[0] < 5) throw new GPLException(shape + " must have more than 4 points/sides.");
+        }
+
+        public bool IsShape(String cmd)
         {
             return shapes.Contains(cmd);
         }
