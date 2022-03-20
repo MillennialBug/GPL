@@ -22,11 +22,11 @@ namespace GraphicalProgrammingLanguage
         {
 			this.sides = parameters[0];
 			this.color = color;
-			int[] params1 = new int[] { parameters[0], parameters[1], 0, parameters[2], parameters[3] };
+			int[] params1 = new int[] { parameters[0], parameters[1], parameters[2], parameters[3] };
 			outer = new Polygon();
 			outer.Set(this.color, params1);
 			outerPoints = outer.GetPoints();
-			int[] params2 = new int[] { parameters[0], parameters[1] / 2, 1, parameters[2], parameters[3] };
+			int[] params2 = new int[] { parameters[0], parameters[1] / 2, parameters[2], parameters[3], 1 };
 			inner = new Polygon();
 			inner.Set(this.color, params2);
 			innerPoints = inner.GetPoints();

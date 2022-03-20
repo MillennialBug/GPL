@@ -11,7 +11,7 @@ namespace GraphicalProgrammingLanguage
     {
         protected int sides;
         protected int width;
-        protected int upsideDown;
+        protected int upsideDown = 0;
         protected Point[] points;
 
         public Polygon() { }
@@ -21,9 +21,9 @@ namespace GraphicalProgrammingLanguage
             this.color = colour;
             this.sides = parameters[0];
             this.width = parameters[1];
-            this.upsideDown = parameters[2];
-            this.xPos = parameters[3];
-            this.yPos = parameters[4];
+            this.xPos = parameters[2];
+            this.yPos = parameters[3];
+            if (parameters.Length == 5) this.upsideDown = parameters[4];
             this.points = new Point[this.sides];
 
             for (int i = 0; i < this.sides; i++)

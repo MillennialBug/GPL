@@ -25,17 +25,20 @@ namespace GraphicalProgrammingLanguage
             foreach(String line in lines)
             {
                 String[] parts = line.Trim(' ').Split(' ');
+                String command = parts[0];
+                String strArguments = "";
+                if (parts.Length > 1) strArguments = parts[1];
                 try
                 {
                     List<int> args;
                     validator.ValidateCommand(parts);
 
-                    if (validator.IsShape(parts[0]))
+                    if (validator.IsShape(command))
                     {
-                        args = this.GetIntArgs(parts[1]);
-                        if (parts[0].Equals("polygon") || parts[0].Equals("star")) validator.ValidatePolygon(parts[0], args);
-                        if(parts[0].Equals("polygon")) args.Add(0); //Add upsideDown parameter which is not currently user defined.
-                        c.DrawShape(shapeFactory.getShape(parts[0]), args);
+                        args = this.GetIntArgs(strArguments);
+                        if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args);
+                        if (command.Equals("square")) args.Add(args[0]); //Adds size of square again so Rectangle can be re-used.
+                        c.DrawShape(shapeFactory.getShape(command), args);
                     }
                     else
                     {
@@ -47,23 +50,23 @@ namespace GraphicalProgrammingLanguage
                                 c.Reset();
                                 break;
                             case "moveto":
-                                args = this.GetIntArgs(parts[1]);
+                                args = this.GetIntArgs(strArguments);
                                 c.MoveCursor(args);
                                 break;
                             case "drawto":
-                                args = this.GetIntArgs(parts[1]);
+                                args = this.GetIntArgs(strArguments);
                                 c.DrawLine(args);
                                 break;
                             case "pen":
                                 try
                                 {
-                                    c.SetColor(ColorTranslator.FromHtml(parts[1]));
+                                    c.SetColor(ColorTranslator.FromHtml(strArguments));
                                 }
                                 catch(Exception e)
                                 {
-                                    if(e.Message.Equals(parts[1] + " is not a valid value for Int32.") || e.Message.Equals("Could not find any recognizable digits."))
+                                    if(e.Message.Equals(strArguments + " is not a valid value for Int32.") || e.Message.Equals("Could not find any recognizable digits."))
                                     {
-                                        throw new GPLException(parts[1] + " is not a valid color name or hex.");
+                                        throw new GPLException(strArguments + " is not a valid color name or hex.");
                                     }
                                     else
                                     {
@@ -72,10 +75,10 @@ namespace GraphicalProgrammingLanguage
                                 }
                                 break;
                             case "fill":
-                                c.SetFill(parts[1]);
+                                c.SetFill(strArguments);
                                 break;
                             default:
-                                throw new GPLException("Unknown command '" + parts[0] + "' found.");
+                                throw new GPLException("Unknown command '" + command + "' found.");
                         }
                     }
 
@@ -94,9 +97,9 @@ namespace GraphicalProgrammingLanguage
             foreach (String s in strArgs)
             {
                 // For variables this will need changing.
-                int tmp;
-                int.TryParse(s, out tmp);
-                args.Add(tmp);
+                int i;
+                int.TryParse(s, out i);
+                args.Add(i);
             }
             return args;
         }

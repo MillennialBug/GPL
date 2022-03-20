@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +60,37 @@ namespace GraphicalProgrammingLanguage
             if (e.KeyCode == Keys.Enter)
             {
                 //Check code for errors
+            }
+        }
+
+        private void load_button_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                openFileDialog.Filter = "gpl files (*.gpl)|*.gpl|All files (*.*)|*.*";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    programBox.Text = File.ReadAllText(openFileDialog.FileName);
+                }
+            }
+            Refresh();
+        }
+
+        private void save_button_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.InitialDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                saveFileDialog.Filter = "gpl files (*.gpl)|*.gpl|All files (*.*)|*.*";
+                saveFileDialog.RestoreDirectory = true;
+
+                if(saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllText(saveFileDialog.FileName, programBox.Text);
+                }
             }
         }
     }
