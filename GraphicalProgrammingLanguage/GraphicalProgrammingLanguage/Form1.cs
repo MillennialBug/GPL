@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GraphicalProgrammingLanguage
@@ -18,27 +12,23 @@ namespace GraphicalProgrammingLanguage
 
         Bitmap paintingBitmap = new Bitmap(PaintingBitmapWidth, PaintingBitmapHeight);
         Canvas paintingCanvas;
-        ShapeFactory shapeFactory;
-        Graphics g;
         Parser parser;
 
         public Form1()
         {
             InitializeComponent();
             paintingCanvas = new Canvas(Graphics.FromImage(paintingBitmap));
-            this.g = paintingCanvas.GetGraphics();
-            this.shapeFactory = new ShapeFactory();
             parser = new Parser(paintingCanvas);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void RunButton_Click(object sender, EventArgs e)
         {
             paintingCanvas.RestoreDefaultState();
-            parser.parseLines(programBox.Lines);
+            exceptionBox.Lines = parser.parseLines(programBox.Lines, true);
             Refresh();
         }
 
-        private void pictureBox_Paint(object sender, PaintEventArgs e)
+        private void PictureBox_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             g.DrawImageUnscaled(paintingBitmap, 0, 0);
@@ -48,22 +38,22 @@ namespace GraphicalProgrammingLanguage
         {
             if (e.KeyCode == Keys.Enter)
             {
-                parser.parseLines(CommandBox.Lines);
-                CommandBox.Text = "";
+                parser.parseLines(commandBox.Lines, true);
+                commandBox.Text = "";
                 Refresh();
             }
             
         }
 
-        private void TextBox1_KeyDown(object sender, KeyEventArgs e)
+        private void ProgramBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                //Check code for errors
+                CheckButton_Click(sender, e);
             }
         }
 
-        private void load_button_Click(object sender, EventArgs e)
+        private void LoadButton_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -79,7 +69,7 @@ namespace GraphicalProgrammingLanguage
             Refresh();
         }
 
-        private void save_button_Click(object sender, EventArgs e)
+        private void SaveButton_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
@@ -92,6 +82,19 @@ namespace GraphicalProgrammingLanguage
                     File.WriteAllText(saveFileDialog.FileName, programBox.Text);
                 }
             }
+        }
+
+        private void ClearButton_Click(object sender, EventArgs e)
+        {
+            programBox.Clear();
+            exceptionBox.Clear();
+        }
+
+        private void CheckButton_Click(object sender, EventArgs e)
+        {
+            //Check code for errors
+            exceptionBox.Lines = parser.parseLines(programBox.Lines, false);
+            Refresh();
         }
     }
 }

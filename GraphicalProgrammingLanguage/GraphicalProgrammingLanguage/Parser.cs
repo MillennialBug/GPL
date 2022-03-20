@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace GraphicalProgrammingLanguage
 {
@@ -20,11 +21,19 @@ namespace GraphicalProgrammingLanguage
             shapeFactory = new ShapeFactory();
         }
 
-        public void parseLines(String[] lines)
+        public String[] parseLines(String[] lines, Boolean execute)
         {
+            List<String> exceptions = new List<String>();
+
             foreach(String line in lines)
             {
-                String[] parts = line.Trim(' ').Split(' ');
+                line.Trim(' ');
+                if (line.Equals(String.Empty))
+                {
+                    exceptions.Add("");
+                    continue;
+                }
+                String[] parts = line.Split(' ');
                 String command = parts[0];
                 String strArguments = "";
                 if (parts.Length > 1) strArguments = parts[1];
@@ -38,29 +47,30 @@ namespace GraphicalProgrammingLanguage
                         args = this.GetIntArgs(strArguments);
                         if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args);
                         if (command.Equals("square")) args.Add(args[0]); //Adds size of square again so Rectangle can be re-used.
-                        c.DrawShape(shapeFactory.getShape(command), args);
+                        if (execute) c.DrawShape(shapeFactory.getShape(command), args);
                     }
                     else
                     {
                         switch(parts[0]) {
                             case "clear":
-                                c.Clear();
+                                if (execute) c.Clear();
                                 break;
                             case "reset":
-                                c.Reset();
+                                if (execute) c.Reset();
                                 break;
                             case "moveto":
                                 args = this.GetIntArgs(strArguments);
-                                c.MoveCursor(args);
+                                if (execute) c.MoveCursor(args);
                                 break;
                             case "drawto":
                                 args = this.GetIntArgs(strArguments);
-                                c.DrawLine(args);
+                                if (execute) c.DrawLine(args);
                                 break;
                             case "pen":
                                 try
                                 {
-                                    c.SetColor(ColorTranslator.FromHtml(strArguments));
+                                    Color color = ColorTranslator.FromHtml(strArguments);
+                                    if (execute) c.SetColor(color);
                                 }
                                 catch(Exception e)
                                 {
@@ -75,19 +85,24 @@ namespace GraphicalProgrammingLanguage
                                 }
                                 break;
                             case "fill":
-                                c.SetFill(strArguments);
+                                if (execute) c.SetFill(strArguments);
                                 break;
                             default:
                                 throw new GPLException("Unknown command '" + command + "' found.");
                         }
                     }
 
+                    exceptions.Add("");
+
                 } catch (GPLException e)
                 {
-                    Console.WriteLine(e.Message);
+                    exceptions.Add(e.Message);
+                    //Console.WriteLine(e.Message);
                 }
 
             }
+
+            return exceptions.ToArray();
         }
 
         public List<int> GetIntArgs(String argsIn)

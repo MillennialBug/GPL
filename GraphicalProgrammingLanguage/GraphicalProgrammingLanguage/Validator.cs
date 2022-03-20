@@ -10,14 +10,18 @@ namespace GraphicalProgrammingLanguage
 {
     internal class Validator
     {
-        private Dictionary<String, Regex> validCommands = new Dictionary<String, Regex>() { { "circle", new Regex("^\\d*$") }, 
-                                                                                            { "rectangle", new Regex("^\\d*,\\d*$")}, 
+        private static Regex oneInt = new Regex("^\\d*$");
+        private static Regex twoInts = new Regex("^\\d*,\\d*$");
+        private Dictionary<String, Regex> validCommands = new Dictionary<String, Regex>() { { "circle",  oneInt }, 
+                                                                                            { "rectangle", twoInts }, 
                                                                                             { "fill", new Regex("^on|off$") }, 
                                                                                             { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") },
-                                                                                            { "triangle", new Regex("^\\d*$") },
-                                                                                            { "star", new Regex("^\\d*,\\d*$")},
-                                                                                            { "square", new Regex("^\\d*$")},
-                                                                                            { "polygon", new Regex("^\\d*,\\d*$")}
+                                                                                            { "triangle", oneInt },
+                                                                                            { "star", twoInts },
+                                                                                            { "square", oneInt },
+                                                                                            { "polygon", twoInts },
+                                                                                            { "moveto", twoInts },
+                                                                                            { "drawto", twoInts }
                                                                                           };
         private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
         private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill"};
