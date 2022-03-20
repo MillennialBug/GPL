@@ -37,6 +37,7 @@
             this.exceptionBox = new System.Windows.Forms.TextBox();
             this.clearButton = new System.Windows.Forms.Button();
             this.checkButton = new System.Windows.Forms.Button();
+            this.commandException = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -64,7 +65,7 @@
             // 
             this.commandBox.Location = new System.Drawing.Point(12, 979);
             this.commandBox.Name = "commandBox";
-            this.commandBox.Size = new System.Drawing.Size(365, 26);
+            this.commandBox.Size = new System.Drawing.Size(360, 26);
             this.commandBox.TabIndex = 2;
             this.commandBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CommandBox_KeyDown);
             // 
@@ -101,6 +102,7 @@
             // exceptionBox
             // 
             this.exceptionBox.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.exceptionBox.ForeColor = System.Drawing.Color.Red;
             this.exceptionBox.Location = new System.Drawing.Point(396, 12);
             this.exceptionBox.Multiline = true;
             this.exceptionBox.Name = "exceptionBox";
@@ -127,12 +129,22 @@
             this.checkButton.UseVisualStyleBackColor = true;
             this.checkButton.Click += new System.EventHandler(this.CheckButton_Click);
             // 
+            // commandException
+            // 
+            this.commandException.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.commandException.ForeColor = System.Drawing.Color.Red;
+            this.commandException.Location = new System.Drawing.Point(396, 979);
+            this.commandException.Name = "commandException";
+            this.commandException.Size = new System.Drawing.Size(360, 26);
+            this.commandException.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Info;
             this.ClientSize = new System.Drawing.Size(1787, 1022);
+            this.Controls.Add(this.commandException);
             this.Controls.Add(this.checkButton);
             this.Controls.Add(this.clearButton);
             this.Controls.Add(this.exceptionBox);
@@ -161,6 +173,7 @@
         private System.Windows.Forms.TextBox exceptionBox;
         private System.Windows.Forms.Button clearButton;
         private System.Windows.Forms.Button checkButton;
+        private System.Windows.Forms.TextBox commandException;
     }
 }
 

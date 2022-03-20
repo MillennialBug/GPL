@@ -38,8 +38,8 @@ namespace GraphicalProgrammingLanguage
         {
             if (e.KeyCode == Keys.Enter)
             {
-                parser.parseLines(commandBox.Lines, true);
-                commandBox.Text = "";
+                commandException.Lines = parser.parseLines(commandBox.Lines, true);
+                if (commandException.Text == String.Empty) commandBox.Text = "";
                 Refresh();
             }
             

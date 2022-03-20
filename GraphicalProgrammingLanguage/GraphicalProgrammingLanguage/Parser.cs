@@ -30,7 +30,7 @@ namespace GraphicalProgrammingLanguage
                 line.Trim(' ');
                 if (line.Equals(String.Empty))
                 {
-                    exceptions.Add("");
+                    exceptions.Add(String.Empty);
                     continue;
                 }
                 String[] parts = line.Trim(' ').Split(' ');
@@ -92,7 +92,7 @@ namespace GraphicalProgrammingLanguage
                         }
                     }
 
-                    exceptions.Add("");
+                    exceptions.Add(String.Empty);
 
                 } catch (GPLException e)
                 {
