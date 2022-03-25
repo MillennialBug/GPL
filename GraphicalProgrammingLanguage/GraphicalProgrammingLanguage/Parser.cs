@@ -8,12 +8,19 @@ using System.Windows.Forms;
 
 namespace GraphicalProgrammingLanguage
 {
+    /// <summary>
+    /// Parses a String, or String[] one line at a time, to determine what commands and parameters have been entered, and executes them if they are correct and execution is required.
+    /// </summary>
     internal class Parser
     {
         private Validator validator;
         ShapeFactory shapeFactory;
         Canvas c;
 
+        /// <summary>
+        /// Constructor taking a single parameter, a reference to a Canvas object.
+        /// </summary>
+        /// <param name="c">Canvas object</param>
         public Parser(Canvas c)
         {
             this.c = c;
@@ -21,6 +28,12 @@ namespace GraphicalProgrammingLanguage
             shapeFactory = new ShapeFactory();
         }
 
+        /// <summary>
+        /// Parses a String array and either executes a correctly entered command or returns any Exceptions in another String array so they can be shown to the user.
+        /// </summary>
+        /// <param name="lines">String array containing user entered commands.</param>
+        /// <param name="execute">Boolean determining if the commands should be executed (True), or just validated (False).</param>
+        /// <returns>String array holding any exceptions caused by the user inputted commands.</returns>
         public String[] parseLines(String[] lines, Boolean execute)
         {
             List<String> exceptions = new List<String>();
@@ -105,6 +118,11 @@ namespace GraphicalProgrammingLanguage
             return exceptions.ToArray();
         }
 
+        /// <summary>
+        /// Takes in a String and extracts values as Integers, then returns them in a List.
+        /// </summary>
+        /// <param name="argsIn"></param>
+        /// <returns>Integer List containing the converted values.</returns>
         public List<int> GetIntArgs(String argsIn)
         {
             String[] strArgs = argsIn.Split(',');

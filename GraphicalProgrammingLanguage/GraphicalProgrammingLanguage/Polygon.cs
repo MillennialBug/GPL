@@ -7,6 +7,9 @@ using System.Drawing;
 
 namespace GraphicalProgrammingLanguage
 {
+    /// <summary>
+    /// Class to create an equilateral Polygon.
+    /// </summary>
     internal class Polygon : Shape
     {
         protected int sides;
@@ -16,6 +19,11 @@ namespace GraphicalProgrammingLanguage
 
         public Polygon() { }
 
+        /// <summary>
+        /// Takes in a color and a list of integer parameters and sets the internal properties of the class accordingly.
+        /// </summary>
+        /// <param name="colour"></param>
+        /// <param name="parameters"></param>
         override public void Set(Color colour, params int[] parameters)
         {
             this.color = colour;
@@ -23,12 +31,12 @@ namespace GraphicalProgrammingLanguage
             this.width = parameters[1];
             this.xPos = parameters[2];
             this.yPos = parameters[3];
-            if (parameters.Length == 5) this.upsideDown = parameters[4];
+            if (parameters.Length == 5) this.upsideDown = parameters[4]; //Makes the upsidedown parameter optional.
             this.points = new Point[this.sides];
 
             for (int i = 0; i < this.sides; i++)
             {
-                // Super complicated formula for calculating each point of a regular polygon given a centre point.
+                // Formula for calculating each point of a regular polygon given a centre point.
                 if (upsideDown == 1)
                 {
                     //For an odd n sided polygon, this will put the odd vertex at the bottom.
@@ -42,6 +50,11 @@ namespace GraphicalProgrammingLanguage
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="g">Graphics context for the drawing.</param>
+        /// <param name="fill">Boolean determining whether the drawing should be outline or filled.</param>
         public override void Draw(Graphics g, Boolean fill)
         {
             if (!fill)
@@ -55,6 +68,10 @@ namespace GraphicalProgrammingLanguage
             
         }
 
+        /// <summary>
+        /// Returns a Point array containing the verticies of the Polygon.
+        /// </summary>
+        /// <returns>Point array of verticies.</returns>
         public Point[] GetPoints() { return this.points; }
 
     }
