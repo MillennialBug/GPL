@@ -13,9 +13,16 @@ namespace GraphicalProgrammingLanguage
     /// </summary>
     internal class Parser
     {
-        private Validator validator;
+        Validator validator;
         ShapeFactory shapeFactory;
         Canvas c;
+        List<String> exceptions;
+        List<int> args;
+        String[] parts;
+        String strArguments;
+        String command;
+        Color color;
+        Dictionary<String, Variable> variables = new Dictionary<String, Variable>();
 
         /// <summary>
         /// Constructor taking a single parameter, a reference to a Canvas object.
@@ -36,7 +43,7 @@ namespace GraphicalProgrammingLanguage
         /// <returns>String array holding any exceptions caused by the user inputted commands.</returns>
         public String[] parseLines(String[] lines, Boolean execute)
         {
-            List<String> exceptions = new List<String>();
+            exceptions = new List<String>();
 
             foreach(String line in lines)
             {
@@ -46,19 +53,19 @@ namespace GraphicalProgrammingLanguage
                     exceptions.Add(String.Empty);
                     continue;
                 }
-                String[] parts = line.Trim(' ').Split(' ');
-                String command = parts[0];
-                String strArguments = "";
+
+                parts = line.Split(' ');
+                command = parts[0];
+                strArguments = "";
                 if (parts.Length > 1) strArguments = parts[1];
                 try
                 {
-                    List<int> args;
                     validator.ValidateCommand(parts);
 
                     if (validator.IsShape(command))
                     {
                         args = this.GetIntArgs(strArguments);
-                        if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args);
+                        if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args[0]);
                         if (command.Equals("square")) args.Add(args[0]); //Adds size of square again so Rectangle can be re-used.
                         if (execute) c.DrawShape(shapeFactory.getShape(command), args);
                     }
@@ -82,7 +89,7 @@ namespace GraphicalProgrammingLanguage
                             case "pen":
                                 try
                                 {
-                                    Color color = ColorTranslator.FromHtml(strArguments);
+                                    color = ColorTranslator.FromHtml(strArguments);
                                     if (execute) c.SetColor(color);
                                 }
                                 catch(Exception e)
@@ -99,6 +106,13 @@ namespace GraphicalProgrammingLanguage
                                 break;
                             case "fill":
                                 if (execute) c.SetFill(strArguments);
+                                break;
+                            case "var":
+                                if (execute && !variables.ContainsKey(strArguments)) variables.Add(strArguments, new Variable());
+                                else if (execute) throw new GPLException("Variable " + strArguments + "already exists.");
+                                {
+
+                                };
                                 break;
                             default:
                                 throw new GPLException("Unknown command '" + command + "' found.");

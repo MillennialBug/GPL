@@ -21,10 +21,11 @@ namespace GraphicalProgrammingLanguage
                                                                                             { "square", oneInt },
                                                                                             { "polygon", twoInts },
                                                                                             { "moveto", twoInts },
-                                                                                            { "drawto", twoInts }
+                                                                                            { "drawto", twoInts },
+                                                                                            { "var", new Regex("^([a-z]|[A-Z])+$")}
                                                                                           };
         private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
-        private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill"};
+        private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill", "var"};
 
         /// <summary>
         /// Takes a String array, expected to hold 2 values, and validates them to the expected format of acceptable commands for the program using Regex and Lists.
@@ -33,16 +34,20 @@ namespace GraphicalProgrammingLanguage
         /// <exception cref="GPLException">Command not found in a List of valid commands or String array length is not 2.</exception>
         public void ValidateCommand(String[] cmd)
         {
+            // If the command isn't in one of these lists, it doesn't exist.
+            
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]))
             {
                 throw new GPLException("Bad command found: " + cmd[0]);
             }
 
+            // Only single word lines should be reset and clear.
             if(!(String.Equals(cmd[0],"reset") || String.Equals(cmd[0],"clear")) && !(cmd.GetLength(0) == 2))
             {
                 throw new GPLException("No arguments provided: " + cmd.ToString());
             }
 
+            // Seperates the arguments from the command.
             String[] args = new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>();
             ValidateArgs(cmd[0], args);
 
