@@ -12,18 +12,20 @@ namespace GraphicalProgrammingLanguage
     {
         private static Regex oneInt = new Regex("^\\d*$");
         private static Regex twoInts = new Regex("^\\d*,\\d*$");
-        private Dictionary<String, Regex> validCommands = new Dictionary<String, Regex>() { { "circle",  oneInt }, 
-                                                                                            { "rectangle", twoInts }, 
-                                                                                            { "fill", new Regex("^on|off$") }, 
-                                                                                            { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") },
-                                                                                            { "triangle", oneInt },
-                                                                                            { "star", twoInts },
-                                                                                            { "square", oneInt },
-                                                                                            { "polygon", twoInts },
-                                                                                            { "moveto", twoInts },
-                                                                                            { "drawto", twoInts },
-                                                                                            { "var", new Regex("^([a-z]|[A-Z])+$")}
-                                                                                          };
+        private Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
+            { "circle",  oneInt }, 
+            { "rectangle", twoInts }, 
+            { "fill", new Regex("^on|off$") }, 
+            { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") },
+            { "triangle", oneInt },
+            { "star", twoInts },
+            { "square", oneInt },
+            { "polygon", twoInts },
+            { "moveto", twoInts },
+            { "drawto", twoInts },
+            { "var", new Regex("^([a-z]|[A-Z])+$") },
+            { "math", new Regex("^(\\+|\\*|\\\\|\\-|=)$") } 
+        };
         private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
         private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill", "var"};
 
@@ -32,25 +34,58 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="cmd">String array containing a potential command word in [0] and a set of potential arguments in [1].</param>
         /// <exception cref="GPLException">Command not found in a List of valid commands or String array length is not 2.</exception>
-        public void ValidateCommand(String[] cmd)
+        public void ValidateCommand(String[] cmd, Dictionary<String, Variable>.KeyCollection variables)
         {
-            // If the command isn't in one of these lists, it doesn't exist.
-            
-            if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]))
-            {
+            if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && cmd.Length < 2)
                 throw new GPLException("Bad command found: " + cmd[0]);
-            }
+
+            // If the command isn't in one of these lists, and this isn't an assignment statement, it doesn't exist.
+            if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && !cmd[1].Equals("="))
+                throw new GPLException("Bad command found: " + cmd[0]);
+
+            // If creating variable, check it does not exist. Variables should also be a single word only.
+            if (cmd[0].Equals("var") && variables.Contains(cmd[1]) && cmd.Length == 2)
+                throw new GPLException("Variable " + cmd[1] + " already exists");
+
+            // Check if variable exists for assingment
+            if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && cmd[1].Equals("=") && !variables.Contains(cmd[0]))
+                    throw new GPLException("Declaration: Variable " + cmd[0] + " does not exist.");
 
             // Only single word lines should be reset and clear.
-            if(!(String.Equals(cmd[0],"reset") || String.Equals(cmd[0],"clear")) && !(cmd.GetLength(0) == 2))
-            {
+            if (!(String.Equals(cmd[0], "reset") || String.Equals(cmd[0], "clear")) && !(cmd.Length >= 2))
                 throw new GPLException("No arguments provided: " + cmd.ToString());
-            }
 
             // Seperates the arguments from the command.
             String[] args = new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>();
-            ValidateArgs(cmd[0], args);
 
+            if (cmd[1].Equals("="))
+                ValidateVariableAssignment(args, variables);
+            else
+                ValidateArgs(cmd[0], args);
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="variables"></param>
+        /// <exception cref="GPLException"></exception>
+        private void ValidateVariableAssignment(String[] args, Dictionary<String, Variable>.KeyCollection variables)
+        {
+            if(validArgs.TryGetValue("math", out Regex math) && validArgs.TryGetValue("var", out Regex var))
+            {
+                //Each element should be an existing variable, and integer or a math operator.
+                foreach (String arg in args)
+                {
+                    if (!(math.IsMatch(arg) || var.IsMatch(arg) || oneInt.IsMatch(arg)))
+                        throw new GPLException("Bad assignment statement.");
+
+                    if (var.IsMatch(arg))
+                        if (!variables.Contains(arg))
+                            throw new GPLException("Assignment: Variable " + arg + " does not exist.");
+                }
+            }
         }
 
         /// <summary>
@@ -61,14 +96,9 @@ namespace GraphicalProgrammingLanguage
         /// <exception cref="GPLException">Arguments provided do not match the expected format for the command.</exception>
         private void ValidateArgs(String cmd, String[] args)
         {
-            Regex pattern;
-            if (validCommands.TryGetValue(cmd, out pattern))
-            {
+            if (validArgs.TryGetValue(cmd, out Regex pattern))
                 if (!pattern.IsMatch(args[0]))
-                {
                     throw new GPLException("Bad arguments found: " + args[0]);
-                }
-            }
         }
 
         /// <summary>

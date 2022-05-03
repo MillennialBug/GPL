@@ -22,7 +22,7 @@ namespace GraphicalProgrammingLanguage
         String strArguments;
         String command;
         Color color;
-        Dictionary<String, Variable> variables = new Dictionary<String, Variable>();
+        Dictionary<String, Variable> variables;
 
         /// <summary>
         /// Constructor taking a single parameter, a reference to a Canvas object.
@@ -44,8 +44,9 @@ namespace GraphicalProgrammingLanguage
         public String[] parseLines(String[] lines, Boolean execute)
         {
             exceptions = new List<String>();
+            variables = new Dictionary<String, Variable>();
 
-            foreach(String line in lines)
+            foreach (String line in lines)
             {
                 line.Trim(' ');
                 if (line.Equals(String.Empty))
@@ -60,7 +61,16 @@ namespace GraphicalProgrammingLanguage
                 if (parts.Length > 1) strArguments = parts[1];
                 try
                 {
-                    validator.ValidateCommand(parts);
+                    validator.ValidateCommand(parts, variables.Keys);
+
+                    if (parts[1].Equals("=") && (execute))
+                    {
+                        SetVariable(parts[0], new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
+                        
+                        //Below 2 lines for dev only
+                        variables.TryGetValue(parts[0], out Variable v);
+                        Console.WriteLine("Variable " + parts[0] + " = " + v.getValue());
+                    }
 
                     if (validator.IsShape(command))
                     {
@@ -108,14 +118,12 @@ namespace GraphicalProgrammingLanguage
                                 if (execute) c.SetFill(strArguments);
                                 break;
                             case "var":
-                                if (execute && !variables.ContainsKey(strArguments)) variables.Add(strArguments, new Variable());
-                                else if (execute) throw new GPLException("Variable " + strArguments + "already exists.");
-                                {
-
-                                };
+                                variables.Add(strArguments, new Variable());
                                 break;
                             default:
-                                throw new GPLException("Unknown command '" + command + "' found.");
+                                if (!VariableExists(parts[0]))
+                                    throw new GPLException("Unknown command '" + command + "' found.");
+                                break;
                         }
                     }
 
@@ -149,6 +157,60 @@ namespace GraphicalProgrammingLanguage
                 args.Add(i);
             }
             return args;
+        }
+
+        /// <summary>
+        /// Sets a Variable object's attributes. Evaluates expression if required.
+        /// </summary>
+        /// <param name="variable">Variable name to be assigned a value.</param> 
+        /// <param name="expression">Variable value or expression that results in the value.</param> 
+        private void SetVariable(String variable, String[] expression)
+        {
+            // If length of expression is 1 then it's either an int value or another variable.
+            // Set this variable value as such.
+            if (expression.GetLength(0) == 1)
+            {
+                if (variables.TryGetValue(variable, out Variable v))
+                {
+                    if (Int32.TryParse(expression[0], out int i))
+                        v.setValue(i);
+                    else
+                    {
+                        v.setValue(GetVariableValue(expression[0]));
+                    }
+                }
+            }
+            //TODO: Add experssion parsing
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
+        /// <exception cref="GPLException"></exception>
+        private int GetVariableValue(String variable)
+        {
+            return GetVariable(variable).getValue();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
+        /// <exception cref="GPLException"></exception>
+        private Variable GetVariable(String variable)
+        {
+            if (variables.TryGetValue(variable, out Variable v))
+                return v;
+            else
+                throw new GPLException("Problem getting variable " + variable);
+        }
+
+        private bool VariableExists(String variable)
+        {
+            return variables.ContainsKey(variable);
         }
 
         
