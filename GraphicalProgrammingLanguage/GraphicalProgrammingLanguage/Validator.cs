@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-using System.Drawing;
 
 namespace GraphicalProgrammingLanguage
 {
     internal class Validator
     {
         public static Regex oneInt = new Regex("^\\d*$");
-        public static Regex twoInts = new Regex("^\\d*,\\d*$");
+        private static Regex oneWord = new Regex("^([a-z]|[A-Z])+$");
+        private static Regex twoInts = new Regex("^\\d*,\\d*$");
         public static Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
             { "circle",  oneInt }, 
             { "rectangle", twoInts }, 
@@ -23,46 +21,55 @@ namespace GraphicalProgrammingLanguage
             { "polygon", twoInts },
             { "moveto", twoInts },
             { "drawto", twoInts },
-            { "var", new Regex("^([a-z]|[A-Z])+$") },
-            { "math", new Regex("^(\\+|\\*|\\\\|\\-|=)$") } 
+            { "var", oneWord },
+            { "math", new Regex("^(\\+|\\*|\\\\|\\-|=)$") },
+            { "method", oneWord }
         };
         private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
-        private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill", "var"};
+        private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill", "var", "method", "endmethod"};
+        private List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod" };
 
         /// <summary>
-        /// Takes a String array, expected to hold 2 values, and validates them to the expected format of acceptable commands for the program using Regex and Lists.
+        /// Takes a String array and validates the contents against the expected format of acceptable commands for the program using Regex and Lists.
         /// </summary>
         /// <param name="cmd">String array containing a potential command word in [0] and a set of potential arguments in [1].</param>
+        /// <param name="variables">A list of variable names.</param>
+        /// <param name="methods">A list of method names.</param>
         /// <exception cref="GPLException">Command not found in a List of valid commands or String array length is not 2.</exception>
-        public void ValidateCommand(String[] cmd, Dictionary<String, Variable>.KeyCollection variables)
+        public void ValidateCommand(String[] cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods)
         {
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && cmd.Length < 2)
                 throw new GPLException("Bad command found: " + cmd[0]);
+            // Only single word lines should be reset, clear, endmethod or defined methods.
+            else if (!singleWordCommands.Contains(cmd[0])&& cmd.Length < 2)
+                throw new GPLException("No arguments provided: " + cmd.ToString());
 
             // If the command isn't in one of these lists, and this isn't an assignment statement, it doesn't exist.
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && !cmd[1].Equals("="))
                 throw new GPLException("Bad command found: " + cmd[0]);
 
             // If creating variable, check it does not exist. Variables should also be a single word only.
-            if (cmd[0].Equals("var") && variables.Contains(cmd[1]) && cmd.Length == 2)
+            if (cmd[0].Equals("var") && variables.Contains(cmd[1]))
                 throw new GPLException("Variable " + cmd[1] + " already exists");
+
+            // If creating method, check it does not exist. Methods should also be a single word only.
+            if (cmd[0].Equals("method") && methods.Contains(cmd[1]))
+                throw new GPLException("Method " + cmd[1] + " already exists");
 
             // Check if variable exists for assingment
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && cmd[1].Equals("=") && !variables.Contains(cmd[0]))
                     throw new GPLException("Declaration: Variable " + cmd[0] + " does not exist.");
 
-            // Only single word lines should be reset and clear.
-            if (!(String.Equals(cmd[0], "reset") || String.Equals(cmd[0], "clear")) && !(cmd.Length >= 2))
-                throw new GPLException("No arguments provided: " + cmd.ToString());
-
             // Seperates the arguments from the command.
             String[] args = new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>();
 
-            if (cmd[1].Equals("="))
-                ValidateVariableAssignment(args, variables);
-            else
-                ValidateArgs(cmd[0], args);
+            if (cmd.Length >= 2)
+            {
+                if (cmd[1].Equals("="))
+                    ValidateVariableAssignment(args, variables);
+            }
 
+            ValidateArgs(cmd[0], args);
         }
 
         /// <summary>

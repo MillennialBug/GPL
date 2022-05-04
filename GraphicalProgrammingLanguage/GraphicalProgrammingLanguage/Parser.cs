@@ -18,13 +18,17 @@ namespace GraphicalProgrammingLanguage
         Validator validator;
         ShapeFactory shapeFactory;
         Canvas c;
-        List<String> exceptions;
+        ExceptionsList exceptions;
         List<int> args;
         String[] parts;
         String strArguments;
         String command;
         Color color;
         Dictionary<String, Variable> variables;
+        Dictionary<String, Method> methods;
+        bool methodFlag;
+        String methodName;
+        String trimmed;
 
         /// <summary>
         /// Constructor taking a single parameter, a reference to a Canvas object.
@@ -42,33 +46,54 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="lines">String array containing user entered commands.</param>
         /// <param name="execute">Boolean determining if the commands should be executed (True), or just validated (False).</param>
+        /// <param name="nestedExec">Boolean to determine if execution is nested. This stops lists being destroyed. Default False.</param>
         /// <returns>String array holding any exceptions caused by the user inputted commands.</returns>
-        public String[] parseLines(String[] lines, Boolean execute)
+        public String[] parseLines(String[] lines, Boolean execute, Boolean nestedExec = false)
         {
-            exceptions = new List<String>();
-            variables = new Dictionary<String, Variable>();
+            if (!nestedExec)
+            {
+                exceptions = new ExceptionsList();
+                variables = new Dictionary<string, Variable>();
+                methods = new Dictionary<string, Method>();
+            }
+            methodFlag = false;
 
             foreach (String line in lines)
             {
-                line.Trim(' ');
-                if (line.Equals(String.Empty))
+                trimmed = line.Trim(' ');
+                if (trimmed.Equals(String.Empty))
                 {
                     exceptions.Add(String.Empty);
                     continue;
                 }
 
-                parts = line.Split(' ');
+                parts = trimmed.Split(' ');
                 command = parts[0];
                 strArguments = "";
+
+
                 if (parts.Length > 1) strArguments = parts[1];
                 try
                 {
-                    validator.ValidateCommand(parts, variables.Keys);
+                    if(!methods.ContainsKey(command))
+                        validator.ValidateCommand(parts, variables.Keys, methods.Keys);
 
-                    if (parts[1].Equals("=") && (execute))
+                    if(command.Equals("endmethod"))
                     {
-                        SetVariable(parts[0], new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
-                        
+                        methodName = String.Empty;
+                        methodFlag = false;
+                        exceptions.Add(String.Empty);
+                        continue;
+                    }
+
+                    if (methodFlag)
+                    {
+                        if (methods.TryGetValue(methodName, out Method method))
+                        {
+                            method.AddLine(trimmed);
+                            exceptions.Add(String.Empty);
+                            continue;
+                        }
                     }
 
                     if (validator.IsShape(command))
@@ -80,7 +105,7 @@ namespace GraphicalProgrammingLanguage
                     }
                     else
                     {
-                        switch(parts[0]) {
+                        switch(command) {
                             case "clear":
                                 if (execute) c.Clear();
                                 break;
@@ -119,14 +144,26 @@ namespace GraphicalProgrammingLanguage
                             case "var":
                                 variables.Add(strArguments, new Variable());
                                 break;
+                            case "method":
+                                methodName = strArguments;
+                                methods.Add(methodName, new Method());
+                                methodFlag = true;
+                                break;
                             default:
-                                if (!VariableExists(parts[0]))
-                                    throw new GPLException("Unknown command '" + command + "' found.");
                                 break;
                         }
+
+                        if (MethodExists(command))
+                        {
+                            parseLines(GetMethod(command).GetBodyAsArray(), execute, true);
+                        }
+
+                        if (VariableExists(command))
+                            if (execute) SetVariableValue(command, new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
+                            else throw new GPLException("Unknown command '" + command + "' found.");
                     }
 
-                    exceptions.Add(String.Empty);
+                    if(!nestedExec) exceptions.Add(String.Empty);
 
                 } catch (GPLException e)
                 {
@@ -163,11 +200,11 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="variable">Variable name to be assigned a value.</param> 
         /// <param name="expression">Variable value or expression that results in the value.</param> 
-        private void SetVariable(String variable, String[] expression)
+        private void SetVariableValue(String variable, String[] expression)
         {
             DataTable dt = new DataTable();
             String parsed = "";
-            int j = 0;
+
             // If length of expression is 1 then it's either an int value or another variable.
             // Set this variable value as such.
             if (variables.TryGetValue(variable, out Variable v))
@@ -226,6 +263,20 @@ namespace GraphicalProgrammingLanguage
         }
 
         /// <summary>
+        /// Returns a method object when given a valid method name.
+        /// </summary>
+        /// <param name="method">Name of the method to return.</param>
+        /// <returns>Method object.</returns>
+        /// <exception cref="GPLException">Method does not exist.</exception>
+        private Method GetMethod(String method)
+        {
+            if (methods.TryGetValue(method, out Method m))
+                return m;
+            else
+                throw new GPLException("Problem getting method " + method);
+        }
+
+        /// <summary>
         /// Checks if a variable exists.
         /// </summary>
         /// <param name="variable">Name of variable to check for.</param>
@@ -235,6 +286,14 @@ namespace GraphicalProgrammingLanguage
             return variables.ContainsKey(variable);
         }
 
-        
+        /// <summary>
+        /// Checks if a method exists.
+        /// </summary>
+        /// <param name="method">Name of method to check for.</param>
+        /// <returns>Boolean result</returns>
+        private bool MethodExists(String method)
+        {
+            return methods.ContainsKey(method);
+        }
     }
 }
