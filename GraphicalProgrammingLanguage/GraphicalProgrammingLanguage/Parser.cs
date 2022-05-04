@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.Data;
 
 namespace GraphicalProgrammingLanguage
 {
@@ -67,9 +69,6 @@ namespace GraphicalProgrammingLanguage
                     {
                         SetVariable(parts[0], new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
                         
-                        //Below 2 lines for dev only
-                        variables.TryGetValue(parts[0], out Variable v);
-                        Console.WriteLine("Variable " + parts[0] + " = " + v.getValue());
                     }
 
                     if (validator.IsShape(command))
@@ -166,40 +165,58 @@ namespace GraphicalProgrammingLanguage
         /// <param name="expression">Variable value or expression that results in the value.</param> 
         private void SetVariable(String variable, String[] expression)
         {
+            DataTable dt = new DataTable();
+            String parsed = "";
+            int j = 0;
             // If length of expression is 1 then it's either an int value or another variable.
             // Set this variable value as such.
-            if (expression.GetLength(0) == 1)
+            if (variables.TryGetValue(variable, out Variable v))
             {
-                if (variables.TryGetValue(variable, out Variable v))
+                if (expression.GetLength(0) == 1)
                 {
                     if (Int32.TryParse(expression[0], out int i))
                         v.setValue(i);
                     else
                     {
+                        // Already checked that the variable exists.
                         v.setValue(GetVariableValue(expression[0]));
                     }
                 }
+                else
+                {
+                    if (Validator.validArgs.TryGetValue("var", out Regex var))
+                    {
+                        //Multi element expression.
+                        //First replace any variables with their value
+                        foreach (String s in expression)
+                        {
+                            parsed += (var.IsMatch(s)) ? GetVariableValue(s).ToString() : s;
+                        }
+
+                        v.setValue(Int32.Parse(dt.Compute(parsed, "").ToString()));
+                    }
+                }
             }
-            //TODO: Add experssion parsing
+            // Doing this right at the end when we know it's valid. Belts and Braces!
+            v.setExpression(expression);
         }
 
         /// <summary>
-        /// 
+        /// Simply returns the value of a variable when given a valid variable name.
         /// </summary>
-        /// <param name="variable"></param>
-        /// <returns></returns>
-        /// <exception cref="GPLException"></exception>
+        /// <param name="variable">Name of the variable to return the value of.</param>
+        /// <returns>Value of the named variable.</returns>
         private int GetVariableValue(String variable)
         {
             return GetVariable(variable).getValue();
         }
 
         /// <summary>
-        /// 
+        /// Returns a variable object when given a valid variable name.
         /// </summary>
-        /// <param name="variable"></param>
-        /// <returns></returns>
-        /// <exception cref="GPLException"></exception>
+        /// <param name="variable">Name of the variable to return.</param>
+        /// <returns>Variable object.</returns>
+        /// <exception cref="GPLException">Variable does not exist.</exception>
         private Variable GetVariable(String variable)
         {
             if (variables.TryGetValue(variable, out Variable v))
@@ -208,6 +225,11 @@ namespace GraphicalProgrammingLanguage
                 throw new GPLException("Problem getting variable " + variable);
         }
 
+        /// <summary>
+        /// Checks if a variable exists.
+        /// </summary>
+        /// <param name="variable">Name of variable to check for.</param>
+        /// <returns>Boolean result.</returns>
         private bool VariableExists(String variable)
         {
             return variables.ContainsKey(variable);

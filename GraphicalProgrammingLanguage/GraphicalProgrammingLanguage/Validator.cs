@@ -10,9 +10,9 @@ namespace GraphicalProgrammingLanguage
 {
     internal class Validator
     {
-        private static Regex oneInt = new Regex("^\\d*$");
-        private static Regex twoInts = new Regex("^\\d*,\\d*$");
-        private Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
+        public static Regex oneInt = new Regex("^\\d*$");
+        public static Regex twoInts = new Regex("^\\d*,\\d*$");
+        public static Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
             { "circle",  oneInt }, 
             { "rectangle", twoInts }, 
             { "fill", new Regex("^on|off$") }, 
@@ -75,6 +75,7 @@ namespace GraphicalProgrammingLanguage
         {
             if(validArgs.TryGetValue("math", out Regex math) && validArgs.TryGetValue("var", out Regex var))
             {
+                //TODO: Could add validation for order of items i.e. should start with int or variable, then one math operator, then one int/var etc.
                 //Each element should be an existing variable, and integer or a math operator.
                 foreach (String arg in args)
                 {

@@ -9,7 +9,7 @@ namespace GraphicalProgrammingLanguage
     internal class Variable
     {
         private int value;
-        private String expression;
+        private String[] expression;
 
         public int getValue()
         {
@@ -21,12 +21,12 @@ namespace GraphicalProgrammingLanguage
             this.value = value;
         }
 
-        public String getExpression()
+        public String[] getExpression()
         {
             return this.expression;
         }
 
-        public void setExpression(String expression)
+        public void setExpression(String[] expression)
         {
             this.expression = expression;
         }
