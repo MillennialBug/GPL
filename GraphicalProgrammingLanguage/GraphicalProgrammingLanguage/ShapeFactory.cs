@@ -8,7 +8,12 @@ namespace GraphicalProgrammingLanguage
 {
     internal class ShapeFactory
     {
-        public Shape getShape(String name)
+        private static ShapeFactory shapeFactory = new ShapeFactory();
+
+        private ShapeFactory() { }
+
+        public static ShapeFactory GetShapeFactory() { return shapeFactory; }
+        public Shape GetShape(String name)
         {
             if (name.Equals("circle"))
             {

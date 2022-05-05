@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Data;
 
@@ -17,8 +14,8 @@ namespace GraphicalProgrammingLanguage
     {
         Validator validator;
         ShapeFactory shapeFactory;
-        Canvas c;
-        ExceptionsList exceptions;
+        Canvas canvas;
+        ExceptionsList exceptionsList;
         List<int> args;
         String[] parts;
         String strArguments;
@@ -29,17 +26,21 @@ namespace GraphicalProgrammingLanguage
         bool methodFlag;
         String methodName;
         String trimmed;
+        private static Parser parser = new Parser();
 
         /// <summary>
         /// Constructor taking a single parameter, a reference to a Canvas object.
         /// </summary>
         /// <param name="c">Canvas object</param>
-        public Parser(Canvas c)
+        private Parser()
         {
-            this.c = c;
-            validator = new Validator();
-            shapeFactory = new ShapeFactory();
+            validator = Validator.GetValidator();
+            shapeFactory = ShapeFactory.GetShapeFactory();
         }
+
+        public static Parser GetParser() { return parser; }
+
+        public void SetCanvas(Canvas canvas) { this.canvas = canvas; }
 
         /// <summary>
         /// Parses a String array and either executes a correctly entered command or returns any Exceptions in another String array so they can be shown to the user.
@@ -52,10 +53,11 @@ namespace GraphicalProgrammingLanguage
         {
             if (!nestedExec)
             {
-                exceptions = new ExceptionsList();
                 variables = new Dictionary<string, Variable>();
                 methods = new Dictionary<string, Method>();
+                exceptionsList = new ExceptionsList();
             }
+            
             methodFlag = false;
 
             foreach (String line in lines)
@@ -63,7 +65,7 @@ namespace GraphicalProgrammingLanguage
                 trimmed = line.Trim(' ');
                 if (trimmed.Equals(String.Empty))
                 {
-                    exceptions.Add(String.Empty);
+                    exceptionsList.Add(String.Empty);
                     continue;
                 }
 
@@ -82,7 +84,7 @@ namespace GraphicalProgrammingLanguage
                     {
                         methodName = String.Empty;
                         methodFlag = false;
-                        exceptions.Add(String.Empty);
+                        exceptionsList.Add(String.Empty);
                         continue;
                     }
 
@@ -91,7 +93,7 @@ namespace GraphicalProgrammingLanguage
                         if (methods.TryGetValue(methodName, out Method method))
                         {
                             method.AddLine(trimmed);
-                            exceptions.Add(String.Empty);
+                            exceptionsList.Add(String.Empty);
                             continue;
                         }
                     }
@@ -101,30 +103,30 @@ namespace GraphicalProgrammingLanguage
                         args = this.GetIntArgs(strArguments);
                         if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args[0]);
                         if (command.Equals("square")) args.Add(args[0]); //Adds size of square again so Rectangle can be re-used.
-                        if (execute) c.DrawShape(shapeFactory.getShape(command), args);
+                        if (execute) canvas.DrawShape(shapeFactory.GetShape(command), args);
                     }
                     else
                     {
                         switch(command) {
                             case "clear":
-                                if (execute) c.Clear();
+                                if (execute) canvas.Clear();
                                 break;
                             case "reset":
-                                if (execute) c.Reset();
+                                if (execute) canvas.Reset();
                                 break;
                             case "moveto":
                                 args = this.GetIntArgs(strArguments);
-                                if (execute) c.MoveCursor(args);
+                                if (execute) canvas.MoveCursor(args);
                                 break;
                             case "drawto":
                                 args = this.GetIntArgs(strArguments);
-                                if (execute) c.DrawLine(args);
+                                if (execute) canvas.DrawLine(args);
                                 break;
                             case "pen":
                                 try
                                 {
                                     color = ColorTranslator.FromHtml(strArguments);
-                                    if (execute) c.SetColor(color);
+                                    if (execute) canvas.SetColor(color);
                                 }
                                 catch(Exception e)
                                 {
@@ -139,7 +141,7 @@ namespace GraphicalProgrammingLanguage
                                 }
                                 break;
                             case "fill":
-                                if (execute) c.SetFill(strArguments);
+                                if (execute) canvas.SetFill(strArguments);
                                 break;
                             case "var":
                                 variables.Add(strArguments, new Variable());
@@ -163,17 +165,17 @@ namespace GraphicalProgrammingLanguage
                             else throw new GPLException("Unknown command '" + command + "' found.");
                     }
 
-                    if(!nestedExec) exceptions.Add(String.Empty);
+                    if(!nestedExec) exceptionsList.Add(String.Empty);
 
                 } catch (GPLException e)
                 {
-                    exceptions.Add(e.Message);
+                    exceptionsList.Add(e.Message);
                     //Console.WriteLine(e.Message);
                 }
 
             }
 
-            return exceptions.ToArray();
+            return exceptionsList.ToArray();
         }
 
         /// <summary>

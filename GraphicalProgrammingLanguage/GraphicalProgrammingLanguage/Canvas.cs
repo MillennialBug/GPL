@@ -23,17 +23,21 @@ namespace GraphicalProgrammingLanguage
         int yPos = DEFAULT_Y_POS;
         bool fill = false;
 
+        private static Canvas canvas = new Canvas();
+
         /// <summary>
         /// Constructor for Canvas taking a single argument. Also sets default color and default pen.
         /// </summary>
         /// <param name="g">Graphics context for drawing to.</param>
-        public Canvas(Graphics g)
+        private Canvas()
         {
-            this.g = g;
             this.color = Color.Black;
             this.pen = new Pen(this.color);
         }
 
+        public static Canvas GetCanvas() { return canvas; }
+
+        public void SetGraphics(Graphics g) { this.g = g; }
         /// <summary>
         /// Returns the Canvas' Graphics context so it can be used by other Classes if necessary.
         /// </summary>

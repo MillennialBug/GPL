@@ -28,6 +28,11 @@ namespace GraphicalProgrammingLanguage
         private List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
         private List<String> commands = new List<String>() { "moveto", "drawto", "reset", "clear", "pen", "fill", "var", "method", "endmethod"};
         private List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod" };
+        private static Validator validator = new Validator();
+
+        private Validator() { }
+
+        public static Validator GetValidator() { return validator; }
 
         /// <summary>
         /// Takes a String array and validates the contents against the expected format of acceptable commands for the program using Regex and Lists.

@@ -17,8 +17,10 @@ namespace GraphicalProgrammingLanguage
         public Form1()
         {
             InitializeComponent();
-            paintingCanvas = new Canvas(Graphics.FromImage(paintingBitmap));
-            parser = new Parser(paintingCanvas);
+            paintingCanvas = Canvas.GetCanvas();
+            paintingCanvas.SetGraphics(Graphics.FromImage(paintingBitmap));
+            parser = Parser.GetParser();
+            parser.SetCanvas(paintingCanvas);
         }
 
         private void RunButton_Click(object sender, EventArgs e)
