@@ -98,6 +98,20 @@ namespace GraphicalProgrammingLanguage
                         }
                     }
 
+                    if (MethodExists(command))
+                    {
+                        parseLines(GetMethod(command).GetBodyAsArray(), execute, true);
+                        if (!nestedExec) exceptionsList.Add(String.Empty);
+                        continue;
+                    }
+
+                    if (VariableExists(command))
+                    {
+                        if (execute) SetVariableValue(command, new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
+                        if (!nestedExec) exceptionsList.Add(String.Empty);
+                        continue;
+                    }
+
                     if (validator.IsShape(command))
                     {
                         args = this.GetIntArgs(strArguments);
@@ -152,17 +166,8 @@ namespace GraphicalProgrammingLanguage
                                 methodFlag = true;
                                 break;
                             default:
-                                break;
+                                throw new GPLException("Unknown command '" + command + "' found.");
                         }
-
-                        if (MethodExists(command))
-                        {
-                            parseLines(GetMethod(command).GetBodyAsArray(), execute, true);
-                        }
-
-                        if (VariableExists(command))
-                            if (execute) SetVariableValue(command, new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
-                            else throw new GPLException("Unknown command '" + command + "' found.");
                     }
 
                     if(!nestedExec) exceptionsList.Add(String.Empty);
