@@ -10,7 +10,7 @@ namespace GraphicalProgrammingLanguage
     /// <summary>
     /// Class to create an equilateral Polygon.
     /// </summary>
-    internal class Polygon : Shape
+    public class Polygon : Shape
     {
         protected int sides;
         protected int width;

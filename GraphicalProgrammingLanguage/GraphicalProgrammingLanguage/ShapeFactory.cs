@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class ShapeFactory
+    public class ShapeFactory
     {
         private static ShapeFactory shapeFactory = new ShapeFactory();
 

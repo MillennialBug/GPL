@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class Star : Shape
+    public class Star : Shape
     {
         protected Polygon inner;
 		protected Point[] innerPoints;

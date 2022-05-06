@@ -10,7 +10,7 @@ namespace GraphicalProgrammingLanguage
     /// <summary>
     /// Parses a String, or String[] one line at a time, to determine what commands and parameters have been entered, and executes them if they are correct and execution is required.
     /// </summary>
-    internal class Parser
+    public class Parser
     {
         Validator validator;
         ShapeFactory shapeFactory;
@@ -175,7 +175,6 @@ namespace GraphicalProgrammingLanguage
                 } catch (GPLException e)
                 {
                     exceptionsList.Add(e.Message);
-                    //Console.WriteLine(e.Message);
                 }
 
             }
@@ -209,40 +208,9 @@ namespace GraphicalProgrammingLanguage
         /// <param name="expression">Variable value or expression that results in the value.</param> 
         private void SetVariableValue(String variable, String[] expression)
         {
-            DataTable dt = new DataTable();
-            String parsed = "";
-
-            // If length of expression is 1 then it's either an int value or another variable.
-            // Set this variable value as such.
-            if (variables.TryGetValue(variable, out Variable v))
-            {
-                if (expression.GetLength(0) == 1)
-                {
-                    if (Int32.TryParse(expression[0], out int i))
-                        v.setValue(i);
-                    else
-                    {
-                        // Already checked that the variable exists.
-                        v.setValue(GetVariableValue(expression[0]));
-                    }
-                }
-                else
-                {
-                    if (Validator.validArgs.TryGetValue("var", out Regex var))
-                    {
-                        //Multi element expression.
-                        //First replace any variables with their value
-                        foreach (String s in expression)
-                        {
-                            parsed += (var.IsMatch(s)) ? GetVariableValue(s).ToString() : s;
-                        }
-
-                        v.setValue(Int32.Parse(dt.Compute(parsed, "").ToString()));
-                    }
-                }
-            }
-            // Doing this right at the end when we know it's valid. Belts and Braces!
-            v.setExpression(expression);
+            Variable v = GetVariable(variable);
+            v.SetExpression(expression);
+            v.SetValue(variables);
         }
 
         /// <summary>
@@ -252,7 +220,7 @@ namespace GraphicalProgrammingLanguage
         /// <returns>Value of the named variable.</returns>
         private int GetVariableValue(String variable)
         {
-            return GetVariable(variable).getValue();
+            return GetVariable(variable).GetValue();
         }
 
         /// <summary>
@@ -301,6 +269,21 @@ namespace GraphicalProgrammingLanguage
         private bool MethodExists(String method)
         {
             return methods.ContainsKey(method);
+        }
+
+        public String GetParsedExpression(String[] expression)
+        {
+            Validator.validArgs.TryGetValue("var", out Regex var);
+            String parsed = "";
+
+            //Multi element expression.
+            //First replace any variables with their value
+            foreach (String s in expression)
+            {
+                parsed += var.IsMatch(s) ? GetVariableValue(s).ToString() : s;
+            }
+
+            return parsed;
         }
     }
 }

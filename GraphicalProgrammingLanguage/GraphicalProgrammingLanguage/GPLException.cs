@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class GPLException : Exception
+    public class GPLException : Exception
     {
         public GPLException(String message) : base(message)
         {

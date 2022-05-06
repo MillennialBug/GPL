@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class Rectangle : Shape
+    public class Rectangle : Shape
     {
         protected int width;
         protected int height;

@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class Triangle : Polygon
+    public class Triangle : Polygon
     {
         override public void Set(Color color, params int[] parameters)
         {

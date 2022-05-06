@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class Method
+    public class Method
     {
         private List<String> body;
 

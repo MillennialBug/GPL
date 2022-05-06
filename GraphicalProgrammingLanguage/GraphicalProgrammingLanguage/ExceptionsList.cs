@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class ExceptionsList : List<String>
+    public class ExceptionsList : List<String>
     {
         public void AddAll(String[] strings)
         {

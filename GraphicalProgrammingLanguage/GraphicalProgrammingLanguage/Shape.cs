@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    abstract internal class Shape : ShapeInterface
+    abstract public class Shape : ShapeInterface
     {
         protected int xPos, yPos;
         protected Color color;

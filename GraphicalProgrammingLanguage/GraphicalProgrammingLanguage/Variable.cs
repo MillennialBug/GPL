@@ -6,29 +6,24 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class Variable
+    public class Variable
     {
         private int value;
-        private String[] expression;
+        private Expression expression;
 
-        public int getValue()
+        public int GetValue()
         {
             return this.value;
         }
 
-        public void setValue(int value)
+        public void SetValue(Dictionary<String, Variable> d)
         {
-            this.value = value;
+            this.value = this.expression.Evaluate(d);
         }
 
-        public String[] getExpression()
+        public void SetExpression(String[] expression)
         {
-            return this.expression;
-        }
-
-        public void setExpression(String[] expression)
-        {
-            this.expression = expression;
+            this.expression = new Expression(expression);
         }
 
     }

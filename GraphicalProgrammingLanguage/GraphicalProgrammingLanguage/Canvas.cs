@@ -10,7 +10,7 @@ namespace GraphicalProgrammingLanguage
     /// <summary>
     /// The Canvas class acts as a controller for drawing onto a Graphics context.
     /// </summary>
-    internal class Canvas
+    public class Canvas
     {
         const int DEFAULT_X_POS = 0;
         const int DEFAULT_Y_POS = 0;

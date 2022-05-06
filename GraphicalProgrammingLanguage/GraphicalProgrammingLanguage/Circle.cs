@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace GraphicalProgrammingLanguage
 {
-    internal class Circle : Shape
+    public class Circle : Shape
     {
         protected int diameter;
 
