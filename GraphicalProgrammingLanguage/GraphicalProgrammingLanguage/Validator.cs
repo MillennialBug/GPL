@@ -7,21 +7,21 @@ namespace GraphicalProgrammingLanguage
 {
     public class Validator
     {
-        public static Regex oneInt = new Regex("^\\d*$");
+        public static Regex oneArg = new Regex("^(\\d+|[a-zA-Z]+)$");
         public static Regex oneWord = new Regex("^([a-zA-Z])+$");
-        public static Regex twoInts = new Regex("^\\d*,\\d*$");
+        public static Regex twoArgs = new Regex("^(\\d+|[a-zA-Z]+),(\\d+|[a-zA-Z]+)$");
         public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s]");
         public static Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
-            { "circle",  oneInt }, 
-            { "rectangle", twoInts }, 
+            { "circle",  oneArg }, 
+            { "rectangle", twoArgs }, 
             { "fill", new Regex("^on|off$") }, 
             { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") },
-            { "triangle", oneInt },
-            { "star", twoInts },
-            { "square", oneInt },
-            { "polygon", twoInts },
-            { "moveto", twoInts },
-            { "drawto", twoInts },
+            { "triangle", oneArg },
+            { "star", twoArgs },
+            { "square", oneArg },
+            { "polygon", twoArgs },
+            { "moveto", twoArgs },
+            { "drawto", twoArgs },
             { "var", oneWord },
             { "math", new Regex("^(\\+|\\*|\\\\|\\-|=)$") },
             { "method", oneWord }
@@ -63,9 +63,12 @@ namespace GraphicalProgrammingLanguage
                 // If creating variable, check it does not exist.
                 if (cmd[0].Equals("var") && variables.Contains(cmd[1]))
                     throw new GPLException("Variable " + cmd[1] + " already exists");
+                // Check that variable is not a command/method name.
+                else if (cmd[0].Equals("var") &&  (shapes.Contains(cmd[1]) || commands.Contains(cmd[1]) || singleWordCommands.Contains(cmd[1]) || methods.Contains(cmd[1])))
+                    throw new GPLException("Variable name cannot be the same as an existing command or method.");
                 // Check if variable exists for assingment
                 else if (cmd[1].Equals("="))
-                    if(!variables.Contains(cmd[0]))
+                    if (!variables.Contains(cmd[0]))
                         throw new GPLException("Variable " + cmd[0] + " does not exist and cannot be assigned a value.");
                     else
                         ValidateVariableAssignment(cmd, variables);
@@ -73,6 +76,9 @@ namespace GraphicalProgrammingLanguage
                 // If creating method, check it does not exist.
                 if (cmd[0].Equals("method") && methods.Contains(cmd[1]))
                     throw new GPLException("Method " + cmd[1] + " already exists");
+                // Check that method is not a command/variable name.
+                else if (cmd[0].Equals("method") && (shapes.Contains(cmd[1]) || commands.Contains(cmd[1]) || singleWordCommands.Contains(cmd[1]) || variables.Contains(cmd[1])))
+                    throw new GPLException("Mathod name cannot be the same as an existing command or variable.");
 
                 ValidateArgs(cmd[0], new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>());
             }

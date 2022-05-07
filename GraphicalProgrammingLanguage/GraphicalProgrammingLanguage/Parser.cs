@@ -189,13 +189,17 @@ namespace GraphicalProgrammingLanguage
         /// <returns>Integer List containing the converted values.</returns>
         public List<int> GetIntArgs(String argsIn)
         {
+            Validator.validArgs.TryGetValue("var", out Regex var);
             String[] strArgs = argsIn.Split(',');
             List<int> args = new List<int>();
             foreach (String s in strArgs)
             {
-                // For variables this will need changing.
                 int i;
-                int.TryParse(s, out i);
+                if (var.IsMatch(s))
+                    i = GetVariableValue(s);
+                else
+                    i = Int32.Parse(s);
+
                 args.Add(i);
             }
             return args;

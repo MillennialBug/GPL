@@ -7,8 +7,8 @@ namespace GraphicalProgrammingLanguage
 {
     public partial class Form1 : Form
     {
-        const int PaintingBitmapWidth = 1240;
-        const int PaintingBitmapHeight = 1240;
+        const int PaintingBitmapWidth = 1000;
+        const int PaintingBitmapHeight = 1000;
 
         Bitmap paintingBitmap = new Bitmap(PaintingBitmapWidth, PaintingBitmapHeight);
         Canvas paintingCanvas;

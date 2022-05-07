@@ -16,7 +16,6 @@ namespace GPLNUnitTests
         Dictionary<string, Variable>.KeyCollection variables;
         Dictionary<string, Method> methodsDict;
         Dictionary<string, Method>.KeyCollection methods;
-        ExceptionsList exceptions;
         String[] singleWordCommand;
         String[] multiPartProgramline;
 
@@ -26,7 +25,6 @@ namespace GPLNUnitTests
             validator = Validator.GetValidator();
             variablesDict = new Dictionary<string, Variable>();
             methodsDict = new Dictionary<string, Method>();
-            exceptions = new ExceptionsList();
             singleWordCommand = new String[1];
             multiPartProgramline = new String[10];
 
@@ -200,6 +198,67 @@ namespace GPLNUnitTests
             }
         }
 
+        [TestCaseSource(nameof(ValidCommands))]
+        public void ValidArgs(String s)
+        {
+            //Arrange
+            multiPartProgramline = s.Split(' ');
+
+            //Act
+            try
+            {
+                validator.ValidateCommand(multiPartProgramline, variables, methods);
+            }
+            catch
+            {
+                Assert.Fail();
+                return;
+            }
+            
+        }
+
+        [Test]
+        public void VariableNameNotCommand()
+        {
+            //Arrange
+            multiPartProgramline = "var var".Split(' ');
+
+            //Act
+            try
+            {
+                validator.ValidateCommand(multiPartProgramline, variables, methods);
+            }
+            catch (GPLException ex)
+            {
+                //Assert
+                Assert.That(ex.Message, Is.EqualTo("Variable name cannot be the same as an existing command or method."));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        [Test]
+        public void MethodNameNotCommand()
+        {
+            //Arrange
+            multiPartProgramline = "method method".Split(' ');
+
+            //Act
+            try
+            {
+                validator.ValidateCommand(multiPartProgramline, variables, methods);
+            }
+            catch (GPLException ex)
+            {
+                //Assert
+                Assert.That(ex.Message, Is.EqualTo("Mathod name cannot be the same as an existing command or variable."));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
         [TestCaseSource(nameof(ShapeCommandWordCases))]
         public void IsShapeReturnsTrueForValidShape(String s)
         {
@@ -211,6 +270,15 @@ namespace GPLNUnitTests
         {
             "two = 2",
             "three = three"
+        };
+
+        static string[] ValidCommands =
+        {
+            "circle two",
+            "star 5,three",
+            "rectangle two,three",
+            "triangle 50",
+            "polygon 7,50"
         };
 
         static string[] SingleWordCommandCases = Validator.singleWordCommands.ToArray();

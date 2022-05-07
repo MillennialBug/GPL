@@ -55,6 +55,7 @@
             // 
             this.pictureBox.BackColor = System.Drawing.SystemColors.Window;
             this.pictureBox.Location = new System.Drawing.Point(775, 12);
+            this.pictureBox.Margin = new System.Windows.Forms.Padding(15);
             this.pictureBox.Name = "pictureBox";
             this.pictureBox.Size = new System.Drawing.Size(1000, 1000);
             this.pictureBox.TabIndex = 1;
@@ -142,8 +143,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Info;
-            this.ClientSize = new System.Drawing.Size(1787, 1022);
+            this.AutoSize = true;
+            this.BackColor = System.Drawing.SystemColors.WindowFrame;
+            this.ClientSize = new System.Drawing.Size(1802, 1041);
             this.Controls.Add(this.commandException);
             this.Controls.Add(this.checkButton);
             this.Controls.Add(this.clearButton);
