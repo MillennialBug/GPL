@@ -12,7 +12,7 @@ namespace GraphicalProgrammingLanguage
             this.exp = exp;
         }
 
-        public int Evaluate(Dictionary<String, Variable> variables)
+        public int Evaluate()
         {
             Parser parser = Parser.GetParser();
             System.Data.DataTable dt = new System.Data.DataTable(); 

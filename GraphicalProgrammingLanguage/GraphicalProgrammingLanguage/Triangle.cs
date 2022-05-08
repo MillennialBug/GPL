@@ -12,7 +12,7 @@ namespace GraphicalProgrammingLanguage
         override public void Set(Color color, params int[] parameters)
         {
             this.color = color;
-            int[] params1 = new int[5] { parameters[0], 3, 0, parameters[1], parameters[2] };
+            int[] params1 = new int[4] { 3, parameters[0], parameters[1], parameters[2] };
             base.Set(this.color, params1);
         }
     }

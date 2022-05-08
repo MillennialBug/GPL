@@ -274,7 +274,9 @@ namespace GPLNUnitTests
             "star 5,three",
             "rectangle two,three",
             "triangle 50",
-            "polygon 7,50"
+            "polygon 7,50",
+            "loop 2",
+            "loop two"
         };
 
         static string[] SingleWordCommandCases = Validator.singleWordCommands.ToArray();

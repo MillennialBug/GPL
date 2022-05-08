@@ -22,8 +22,11 @@ namespace GraphicalProgrammingLanguage
         Color color;
         Dictionary<String, Variable> variables;
         Dictionary<String, Method> methods;
+        Dictionary<Int32, Loop> loops;
+        int loopCount;
         bool methodFlag;
         String methodName;
+        bool loopFlag;
         String trimmed;
         private static Parser parser = new Parser();
 
@@ -54,10 +57,13 @@ namespace GraphicalProgrammingLanguage
             {
                 variables = new Dictionary<string, Variable>();
                 methods = new Dictionary<string, Method>();
+                loops = new Dictionary<Int32, Loop>();
+                loopCount = 0;
                 exceptionsList = new ExceptionsList();
             }
             
             methodFlag = false;
+            loopFlag = false;
 
             foreach (String line in lines)
             {
@@ -73,13 +79,13 @@ namespace GraphicalProgrammingLanguage
                 strArguments = "";
 
 
-                if (parts.Length > 1) strArguments = parts[1];
+                if (parts.Length == 2) strArguments = parts[1];
                 try
                 {
-                    if(!methods.ContainsKey(command))
+                    if (!methods.ContainsKey(command))
                         validator.ValidateCommand(parts, variables.Keys, methods.Keys);
 
-                    if(command.Equals("endmethod"))
+                    if (command.Equals("endmethod"))
                     {
                         methodName = String.Empty;
                         methodFlag = false;
@@ -92,6 +98,31 @@ namespace GraphicalProgrammingLanguage
                         if (methods.TryGetValue(methodName, out Method method))
                         {
                             method.AddLine(trimmed);
+                            exceptionsList.Add(String.Empty);
+                            continue;
+                        }
+                    }
+
+                    if (command.Equals("endloop"))
+                    {
+                        loopFlag = false;
+                        exceptionsList.Add(String.Empty);
+                        if (loops.TryGetValue(loopCount, out Loop loop))
+                        {
+                            for (int i = 0; i < loop.GetNumberOfLoops(); i++)
+                            {
+                                parseLines(loop.GetBodyAsArray(), execute, true);
+                            } 
+                        }
+                        loopCount++;
+                        continue;
+                    }
+
+                    if (loopFlag)
+                    {
+                        if(loops.TryGetValue(loopCount, out Loop loop))
+                        {
+                            loop.AddLine(trimmed);
                             exceptionsList.Add(String.Empty);
                             continue;
                         }
@@ -164,6 +195,10 @@ namespace GraphicalProgrammingLanguage
                                 methods.Add(methodName, new Method());
                                 methodFlag = true;
                                 break;
+                            case "loop":
+                                loops.Add(loopCount, new Loop(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()));
+                                loopFlag = true;
+                                break;
                             default:
                                 throw new GPLException("Unknown command '" + command + "' found.");
                         }
@@ -213,7 +248,7 @@ namespace GraphicalProgrammingLanguage
         {
             Variable v = GetVariable(variable);
             v.SetExpression(expression);
-            v.SetValue(variables);
+            v.SetValue();
         }
 
         /// <summary>

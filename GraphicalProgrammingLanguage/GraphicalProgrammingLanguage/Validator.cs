@@ -24,13 +24,13 @@ namespace GraphicalProgrammingLanguage
             { "drawto", twoArgs },
             { "var", oneWord },
             { "math", new Regex("^(\\+|\\*|\\\\|\\-|=)$") },
-            { "method", oneWord }
+            { "method", oneWord },
+            { "loop", oneArg }
         };
         public static List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
-        public static List<String> commands = new List<String>() { "moveto", "drawto", "pen", "fill", "var", "method"};
-        public static List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod" };
+        public static List<String> commands = new List<String>() { "moveto", "drawto", "pen", "fill", "var", "method", "loop"};
+        public static List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod", "endloop" };
         public static Validator validator = new Validator();
-        private String[] args;
 
         private Validator() { }
 

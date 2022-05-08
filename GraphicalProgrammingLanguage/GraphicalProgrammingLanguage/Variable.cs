@@ -16,9 +16,9 @@ namespace GraphicalProgrammingLanguage
             return this.value;
         }
 
-        public void SetValue(Dictionary<String, Variable> d)
+        public void SetValue()
         {
-            this.value = this.expression.Evaluate(d);
+            this.value = this.expression.Evaluate();
         }
 
         public void SetExpression(String[] expression)
