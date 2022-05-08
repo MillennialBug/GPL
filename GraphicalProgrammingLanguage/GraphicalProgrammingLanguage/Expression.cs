@@ -12,7 +12,7 @@ namespace GraphicalProgrammingLanguage
             this.exp = exp;
         }
 
-        public int Evaluate()
+        public int EvaluateValue()
         {
             Parser parser = Parser.GetParser();
             System.Data.DataTable dt = new System.Data.DataTable(); 
@@ -26,6 +26,32 @@ namespace GraphicalProgrammingLanguage
             }
             
             return Int32.Parse(dt.Compute(parser.GetParsedExpression(exp), "").ToString());
+        }
+
+        public bool EvaluateTruth()
+        {
+            Parser parser = Parser.GetParser();
+
+            exp = parser.GetParsedExpression(exp).TrimEnd().Split(' ');
+
+            int a = int.Parse(exp[0]);
+            int b = int.Parse(exp[2]);
+
+            switch(exp[1])
+            {
+                case "==":
+                    return a == b;
+                case "<":
+                    return a < b;
+                case ">":
+                    return a > b;
+                case "<=":
+                    return a <= b;
+                case ">=":
+                    return a >= b;
+                default:
+                    throw new GPLException("Cannot evaluate expression truth.");
+            }
         }
     }
 }

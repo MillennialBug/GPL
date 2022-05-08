@@ -11,6 +11,7 @@ namespace GraphicalProgrammingLanguage
         public static Regex oneWord = new Regex("^([a-zA-Z])+$");
         public static Regex twoArgs = new Regex("^(\\d+|[a-zA-Z]+),(\\d+|[a-zA-Z]+)$");
         public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s]");
+        public static Regex comparrison = new Regex("[==|=>|<=|>|<]{1}");
         public static Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
             { "circle",  oneArg }, 
             { "rectangle", twoArgs }, 
@@ -28,8 +29,8 @@ namespace GraphicalProgrammingLanguage
             { "loop", oneArg }
         };
         public static List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
-        public static List<String> commands = new List<String>() { "moveto", "drawto", "pen", "fill", "var", "method", "loop"};
-        public static List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod", "endloop" };
+        public static List<String> commands = new List<String>() { "moveto", "drawto", "pen", "fill", "var", "method", "loop", "if"};
+        public static List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod", "endloop", "endif" };
         public static Validator validator = new Validator();
 
         private Validator() { }
@@ -113,9 +114,20 @@ namespace GraphicalProgrammingLanguage
         /// <exception cref="GPLException">Arguments provided do not match the expected format for the command.</exception>
         public void ValidateArgs(String cmd, String[] args)
         {
-            if (validArgs.TryGetValue(cmd, out Regex pattern))
-                if (!pattern.IsMatch(args[0]))
-                    throw new GPLException("Bad arguments found: " + args[0]);
+            if (cmd.Equals("if"))
+            {
+                if (args.Length < 3)
+                    throw new GPLException("'If' conditional incorrectly formatted.");
+
+                if (!oneArg.IsMatch(args[0]) || !comparrison.IsMatch(args[1]) || !oneArg.IsMatch(args[2]))
+                    throw new GPLException("'If' conditional incorrectly formatted.");
+            }
+            else
+            {
+                if (validArgs.TryGetValue(cmd, out Regex pattern))
+                    if (!pattern.IsMatch(args[0]))
+                        throw new GPLException("Bad arguments found: " + args[0]);
+            }
         }
 
         /// <summary>

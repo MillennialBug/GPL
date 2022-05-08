@@ -10,6 +10,8 @@ namespace GraphicalProgrammingLanguage
         const int PaintingBitmapWidth = 1000;
         const int PaintingBitmapHeight = 1000;
 
+        bool cleanProgram = true;
+
         Bitmap paintingBitmap = new Bitmap(PaintingBitmapWidth, PaintingBitmapHeight);
         Canvas paintingCanvas;
         Parser parser;
@@ -26,7 +28,11 @@ namespace GraphicalProgrammingLanguage
         private void RunButton_Click(object sender, EventArgs e)
         {
             paintingCanvas.RestoreDefaultState();
-            exceptionBox.Lines = parser.parseLines(programBox.Lines, true);
+            CheckButton_Click(sender, e);
+            if (cleanProgram)
+                parser.parseLines(programBox.Lines, true);
+            else
+                MessageBox.Show("The program contains errors.\n\nPlease correct before running.", "Errors Found");
             Refresh();
         }
 
@@ -40,7 +46,13 @@ namespace GraphicalProgrammingLanguage
         {
             if (e.KeyCode == Keys.Enter)
             {
-                commandException.Lines = parser.parseLines(commandBox.Lines, true);
+                if (commandBox.Text.ToLower().Equals("run"))
+                    RunButton_Click(sender, e);
+                else
+                {
+                    commandException.Lines = parser.parseLines(commandBox.Lines, true);
+                }
+                
                 if (commandException.Text == String.Empty) commandBox.Text = "";
                 Refresh();
             }
@@ -88,15 +100,41 @@ namespace GraphicalProgrammingLanguage
 
         private void ClearButton_Click(object sender, EventArgs e)
         {
-            programBox.Clear();
-            exceptionBox.Clear();
+            DialogResult res = MessageBox.Show("This will clear the program window and Canvas.\nContinue?", "Are you sure?", MessageBoxButtons.YesNo);
+            if(res.Equals(DialogResult.Yes))
+            {
+                programBox.Clear();
+                exceptionBox.Clear();
+                parser.parseLines("clear\nreset".Split('\n'), true);
+                Refresh();
+            }  
         }
 
         private void CheckButton_Click(object sender, EventArgs e)
         {
             //Check code for errors
             exceptionBox.Lines = parser.parseLines(programBox.Lines, false);
+            CheckProgramIsClean();
             Refresh();
+        }
+
+        private void CheckProgramIsClean()
+        {
+            cleanProgram = true;
+            foreach (String s in exceptionBox.Lines)
+            {
+                if (!s.Equals(String.Empty)) cleanProgram = false;
+            }
+        }
+
+        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveButton_Click(sender, e);
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadButton_Click(sender, e);
         }
     }
 }

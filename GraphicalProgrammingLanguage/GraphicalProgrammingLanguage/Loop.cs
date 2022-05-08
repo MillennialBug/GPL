@@ -15,7 +15,7 @@ namespace GraphicalProgrammingLanguage
         public Loop(String[] expression)
         {
             this.expression = new Expression(expression);
-            numberOfLoops = this.expression.Evaluate();
+            numberOfLoops = this.expression.EvaluateValue();
             body = new List<String>();
         }
 

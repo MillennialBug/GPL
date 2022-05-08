@@ -18,7 +18,7 @@ namespace GraphicalProgrammingLanguage
 
         public void SetValue()
         {
-            this.value = this.expression.Evaluate();
+            this.value = this.expression.EvaluateValue();
         }
 
         public void SetExpression(String[] expression)

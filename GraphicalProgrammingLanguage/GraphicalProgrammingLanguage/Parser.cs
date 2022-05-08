@@ -28,6 +28,8 @@ namespace GraphicalProgrammingLanguage
         String methodName;
         bool loopFlag;
         String trimmed;
+        bool ifFlag;
+        bool executeIf;
         private static Parser parser = new Parser();
 
         /// <summary>
@@ -64,6 +66,8 @@ namespace GraphicalProgrammingLanguage
             
             methodFlag = false;
             loopFlag = false;
+            ifFlag = false;
+            executeIf = false;
 
             foreach (String line in lines)
             {
@@ -85,17 +89,41 @@ namespace GraphicalProgrammingLanguage
                     if (!methods.ContainsKey(command))
                         validator.ValidateCommand(parts, variables.Keys, methods.Keys);
 
-                    if (command.Equals("endmethod"))
+                    if (ifFlag)
                     {
-                        methodName = String.Empty;
-                        methodFlag = false;
-                        exceptionsList.Add(String.Empty);
-                        continue;
+                        if (command.Equals("method") || command.Equals("var"))
+                        {
+                            throw new GPLException("Command '" + command + "' cannot be used within an if.");
+                        }
+                            
+                        if (!executeIf)
+                        {
+                            exceptionsList.Add(String.Empty);
+                            continue;
+                        }
+
+                        if (command.Equals("endif"))
+                        {
+                            ifFlag = false;
+                            executeIf = false;
+                            exceptionsList.Add(String.Empty);
+                            continue;
+                        }
                     }
 
                     if (methodFlag)
                     {
-                        if (methods.TryGetValue(methodName, out Method method))
+                        if (command.Equals("endmethod"))
+                        {
+                            methodName = String.Empty;
+                            methodFlag = false;
+                            exceptionsList.Add(String.Empty);
+                            continue;
+                        }
+
+                        if (command.Equals("method") || command.Equals("var"))
+                            throw new GPLException("Command '" + command + "' cannot be used within a method.");
+                        else if (methods.TryGetValue(methodName, out Method method))
                         {
                             method.AddLine(trimmed);
                             exceptionsList.Add(String.Empty);
@@ -103,24 +131,26 @@ namespace GraphicalProgrammingLanguage
                         }
                     }
 
-                    if (command.Equals("endloop"))
-                    {
-                        loopFlag = false;
-                        exceptionsList.Add(String.Empty);
-                        if (loops.TryGetValue(loopCount, out Loop loop))
-                        {
-                            for (int i = 0; i < loop.GetNumberOfLoops(); i++)
-                            {
-                                parseLines(loop.GetBodyAsArray(), execute, true);
-                            } 
-                        }
-                        loopCount++;
-                        continue;
-                    }
-
                     if (loopFlag)
                     {
-                        if(loops.TryGetValue(loopCount, out Loop loop))
+                        if (command.Equals("endloop"))
+                        {
+                            loopFlag = false;
+                            exceptionsList.Add(String.Empty);
+                            if (loops.TryGetValue(loopCount, out Loop loop))
+                            {
+                                for (int i = 0; i < loop.GetNumberOfLoops(); i++)
+                                {
+                                    parseLines(loop.GetBodyAsArray(), execute, true);
+                                }
+                            }
+                            loopCount++;
+                            continue;
+                        }
+
+                        if (command.Equals("loop") || command.Equals("method") || command.Equals("var"))
+                            throw new GPLException("Command '" + command + "' cannot be used within a loop.");
+                        else if(loops.TryGetValue(loopCount, out Loop loop))
                         {
                             loop.AddLine(trimmed);
                             exceptionsList.Add(String.Empty);
@@ -198,6 +228,11 @@ namespace GraphicalProgrammingLanguage
                             case "loop":
                                 loops.Add(loopCount, new Loop(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()));
                                 loopFlag = true;
+                                break;
+                            case "if":
+                                ifFlag = true;
+                                if (checkCondition(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()))
+                                    executeIf = true;
                                 break;
                             default:
                                 throw new GPLException("Unknown command '" + command + "' found.");
@@ -318,10 +353,16 @@ namespace GraphicalProgrammingLanguage
             //First replace any variables with their value
             foreach (String s in expression)
             {
-                parsed += var.IsMatch(s) ? GetVariableValue(s).ToString() : s;
+                parsed += var.IsMatch(s) ? GetVariableValue(s).ToString() + " " : s + " ";
             }
 
             return parsed;
+        }
+
+        public bool checkCondition(String[] condition)
+        {
+            Expression e = new Expression(condition);
+            return e.EvaluateTruth();
         }
     }
 }

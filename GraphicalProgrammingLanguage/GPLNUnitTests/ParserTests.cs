@@ -86,7 +86,7 @@ namespace GPLNUnitTests
             String s = parser.GetParsedExpression("one + one".Split(' '));
 
             //Assert
-            Assert.That(s, Is.EqualTo("1+1"));
+            Assert.That(s, Is.EqualTo("1 + 1 "));
         }
     }
 }
