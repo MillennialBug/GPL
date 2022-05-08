@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 using System.Text.RegularExpressions;
-using System.Data;
 
 namespace GraphicalProgrammingLanguage
 {
@@ -210,7 +209,7 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="variable">Variable name to be assigned a value.</param> 
         /// <param name="expression">Variable value or expression that results in the value.</param> 
-        private void SetVariableValue(String variable, String[] expression)
+        public void SetVariableValue(String variable, String[] expression)
         {
             Variable v = GetVariable(variable);
             v.SetExpression(expression);
@@ -222,7 +221,7 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="variable">Name of the variable to return the value of.</param>
         /// <returns>Value of the named variable.</returns>
-        private int GetVariableValue(String variable)
+        public int GetVariableValue(String variable)
         {
             return GetVariable(variable).GetValue();
         }
@@ -233,7 +232,7 @@ namespace GraphicalProgrammingLanguage
         /// <param name="variable">Name of the variable to return.</param>
         /// <returns>Variable object.</returns>
         /// <exception cref="GPLException">Variable does not exist.</exception>
-        private Variable GetVariable(String variable)
+        public Variable GetVariable(String variable)
         {
             if (variables.TryGetValue(variable, out Variable v))
                 return v;
@@ -247,7 +246,7 @@ namespace GraphicalProgrammingLanguage
         /// <param name="method">Name of the method to return.</param>
         /// <returns>Method object.</returns>
         /// <exception cref="GPLException">Method does not exist.</exception>
-        private Method GetMethod(String method)
+        public Method GetMethod(String method)
         {
             if (methods.TryGetValue(method, out Method m))
                 return m;
@@ -260,7 +259,7 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="variable">Name of variable to check for.</param>
         /// <returns>Boolean result.</returns>
-        private bool VariableExists(String variable)
+        public bool VariableExists(String variable)
         {
             return variables.ContainsKey(variable);
         }
@@ -270,7 +269,7 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="method">Name of method to check for.</param>
         /// <returns>Boolean result</returns>
-        private bool MethodExists(String method)
+        public bool MethodExists(String method)
         {
             return methods.ContainsKey(method);
         }

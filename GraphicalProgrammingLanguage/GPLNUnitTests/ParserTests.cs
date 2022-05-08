@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GraphicalProgrammingLanguage;
 using NUnit.Framework;
 
@@ -51,13 +48,45 @@ namespace GPLNUnitTests
             Assert.That(list[1], Is.EqualTo(2));
         }
 
-        //private void SetVariableValue(String variable, String[] expression)
-        //private int GetVariableValue(String variable)
-        //private Variable GetVariable(String variable)
-        //private Method GetMethod(String method)
-        //private bool VariableExists(String variable)
-        //private bool MethodExists(String method)
-        //public String GetParsedExpression(String[] expression)
+        [TestCase("var one\nvar two\none = 1\ntwo = one + one")]
+        public void ParserVariableMethods(String s) 
+        {
+            //Arrange //Act
+            parser.parseLines(s.Split('\n'), true);
+            Variable two = parser.GetVariable("two");
 
+            //Assert
+            Assert.That(parser.GetVariableValue("one"), Is.EqualTo(1));
+            Assert.That(parser.VariableExists("two"), Is.True);
+            Assert.That(two.GetValue(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ParserMethodMethods()
+        {
+            //Arrange //Act
+            parser.parseLines("method mymethod\ncircle 50\ncircle 75\nendmethod".Split('\n'), true);
+
+            //Assert
+            Assert.That(parser.MethodExists("mymethod"), Is.True);
+            Method m = parser.GetMethod("mymethod");
+            Assert.That(m.GetBodyAsArray().Length, Is.EqualTo(2));
+            Assert.That(m.GetBodyAsArray()[0], Is.EqualTo("circle 50"));
+            Assert.That(m.GetBodyAsArray()[1], Is.EqualTo("circle 75"));
+        }
+
+        //public String GetParsedExpression(String[] expression)
+        [Test]
+        public void GetParsedExpression()
+        {
+            //Arrage
+            parser.parseLines("var one\nvar two\none = 1".Split('\n'), true);
+
+            //Act
+            String s = parser.GetParsedExpression("one + one".Split(' '));
+
+            //Assert
+            Assert.That(s, Is.EqualTo("1+1"));
+        }
     }
 }
