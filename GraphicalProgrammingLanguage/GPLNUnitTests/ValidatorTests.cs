@@ -265,7 +265,7 @@ namespace GPLNUnitTests
             catch (GPLException ex)
             {
                 //Assert
-                Assert.That(ex.Message, Is.EqualTo("Mathod name cannot be the same as an existing command or variable."));
+                Assert.That(ex.Message, Is.EqualTo("Method name cannot be the same as an existing command or variable."));
                 return;
             }
 

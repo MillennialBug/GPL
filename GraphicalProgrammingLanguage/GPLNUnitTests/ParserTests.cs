@@ -45,7 +45,7 @@ namespace GPLNUnitTests
         public void ReturnsValidVarArgsAsInts()
         {
             //Arrange
-            parser.parseLines("var two\ntwo = 2".Split('\n'), true);
+            parser.ParseLines("var two\ntwo = 2".Split('\n'), true);
 
             //Act
             List<int> list = parser.GetIntArgs("two,two");
@@ -63,7 +63,7 @@ namespace GPLNUnitTests
         public void ParserVariableMethods(String s) 
         {
             //Arrange //Act
-            parser.parseLines(s.Split('\n'), true);
+            parser.ParseLines(s.Split('\n'), true);
             Variable two = parser.GetVariable("two");
 
             //Assert
@@ -79,7 +79,7 @@ namespace GPLNUnitTests
         public void ParserMethodMethods()
         {
             //Arrange //Act
-            parser.parseLines("method mymethod\ncircle 50\ncircle 75\nendmethod".Split('\n'), true);
+            parser.ParseLines("method mymethod\ncircle 50\ncircle 75\nendmethod".Split('\n'), true);
 
             //Assert
             Assert.That(parser.MethodExists("mymethod"), Is.True);
@@ -96,7 +96,7 @@ namespace GPLNUnitTests
         public void GetParsedExpression()
         {
             //Arrage
-            parser.parseLines("var one\nvar two\none = 1".Split('\n'), true);
+            parser.ParseLines("var one\nvar two\none = 1".Split('\n'), true);
 
             //Act
             String s = parser.GetParsedExpression("one + one".Split(' '));
@@ -112,7 +112,7 @@ namespace GPLNUnitTests
         public void IfExecutesWhenConditionTrue()
         {
             //Arrange
-            parser.parseLines("var a\nvar b\na = 1\nif a == 1\nb = 2\nendif".Split('\n'), true);
+            parser.ParseLines("var a\nvar b\na = 1\nif a == 1\nb = 2\nendif".Split('\n'), true);
 
             //Act
             Variable b = parser.GetVariable("b");
@@ -128,7 +128,7 @@ namespace GPLNUnitTests
         public void IfDoesNotExecuteWhenConditionFalse()
         {
             //Arrange
-            parser.parseLines("var a\nvar b\na = 1\nif a == 0\nb = 2\nendif".Split('\n'), true);
+            parser.ParseLines("var a\nvar b\na = 1\nif a == 0\nb = 2\nendif".Split('\n'), true);
 
             //Act
             Variable b = parser.GetVariable("b");
@@ -141,7 +141,7 @@ namespace GPLNUnitTests
         public void IncrementAddsOneToVariable()
         {
             //Arrange
-            parser.parseLines("var a\na = 1\na++".Split('\n'), true);
+            parser.ParseLines("var a\na = 1\na++".Split('\n'), true);
 
             //Act
             Variable a = parser.GetVariable("a");
@@ -154,7 +154,7 @@ namespace GPLNUnitTests
         public void DecrementTakesOneFromVariable()
         {
             //Arrange
-            parser.parseLines("var a\na = 2\na--".Split('\n'), true);
+            parser.ParseLines("var a\na = 2\na--".Split('\n'), true);
 
             //Act
             Variable a = parser.GetVariable("a");

@@ -17,7 +17,7 @@ namespace GraphicalProgrammingLanguage
         ExceptionsList exceptionsList;
         List<int> args;
         String[] parts;
-        String strArguments;
+        String strArgument;
         String command;
         Color color;
         Dictionary<String, Variable> variables;
@@ -53,7 +53,7 @@ namespace GraphicalProgrammingLanguage
         /// <param name="execute">Boolean determining if the commands should be executed (True), or just validated (False).</param>
         /// <param name="nestedExec">Boolean to determine if execution is nested. This stops lists being destroyed. Default False.</param>
         /// <returns>String array holding any exceptions caused by the user inputted commands.</returns>
-        public String[] parseLines(String[] lines, Boolean execute, Boolean nestedExec = false)
+        public String[] ParseLines(String[] lines, Boolean execute, Boolean nestedExec = false)
         {
             if (!nestedExec)
             {
@@ -79,11 +79,15 @@ namespace GraphicalProgrammingLanguage
                 }
 
                 parts = trimmed.Split(' ');
-                command = parts[0];
-                strArguments = "";
 
+                if (parts[0].IndexOf('(') > 0)
+                    command = parts[0].Substring(0, parts[0].IndexOf('('));
+                else
+                    command = parts[0];
 
-                if (parts.Length == 2) strArguments = parts[1];
+                strArgument = "";
+
+                if (parts.Length == 2) strArgument = parts[1];
                 try
                 {
                     if (!methods.ContainsKey(command))
@@ -141,7 +145,7 @@ namespace GraphicalProgrammingLanguage
                             {
                                 for (int i = 0; i < loop.GetNumberOfLoops(); i++)
                                 {
-                                    parseLines(loop.GetBodyAsArray(), execute, true);
+                                    ParseLines(loop.GetBodyAsArray(), execute, true);
                                 }
                             }
                             loopCount++;
@@ -160,7 +164,7 @@ namespace GraphicalProgrammingLanguage
 
                     if (MethodExists(command))
                     {
-                        parseLines(GetMethod(command).GetBodyAsArray(), execute, true);
+                        ParseLines(GetMethod(command).GetBodyAsArray(), execute, true);
                         if (!nestedExec) exceptionsList.Add(String.Empty);
                         continue;
                     }
@@ -188,7 +192,7 @@ namespace GraphicalProgrammingLanguage
 
                     if (validator.IsShape(command))
                     {
-                        args = this.GetIntArgs(strArguments);
+                        args = this.GetIntArgs(strArgument);
                         if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args[0]);
                         if (command.Equals("square")) args.Add(args[0]); //Adds size of square again so Rectangle can be re-used.
                         if (execute) canvas.DrawShape(shapeFactory.GetShape(command), args);
@@ -203,24 +207,24 @@ namespace GraphicalProgrammingLanguage
                                 if (execute) canvas.Reset();
                                 break;
                             case "moveto":
-                                args = this.GetIntArgs(strArguments);
+                                args = this.GetIntArgs(strArgument);
                                 if (execute) canvas.MoveCursor(args);
                                 break;
                             case "drawto":
-                                args = this.GetIntArgs(strArguments);
+                                args = this.GetIntArgs(strArgument);
                                 if (execute) canvas.DrawLine(args);
                                 break;
                             case "pen":
                                 try
                                 {
-                                    color = ColorTranslator.FromHtml(strArguments);
+                                    color = ColorTranslator.FromHtml(strArgument);
                                     if (execute) canvas.SetColor(color);
                                 }
                                 catch(Exception e)
                                 {
-                                    if(e.Message.Equals(strArguments + " is not a valid value for Int32.") || e.Message.Equals("Could not find any recognizable digits."))
+                                    if(e.Message.Equals(strArgument + " is not a valid value for Int32.") || e.Message.Equals("Could not find any recognizable digits."))
                                     {
-                                        throw new GPLException(strArguments + " is not a valid color name or hex.");
+                                        throw new GPLException(strArgument + " is not a valid color name or hex.");
                                     }
                                     else
                                     {
@@ -229,14 +233,13 @@ namespace GraphicalProgrammingLanguage
                                 }
                                 break;
                             case "fill":
-                                if (execute) canvas.SetFill(strArguments);
+                                if (execute) canvas.SetFill(strArgument);
                                 break;
                             case "var":
-                                variables.Add(strArguments, new Variable());
+                                variables.Add(strArgument, new Variable());
                                 break;
                             case "method":
-                                methodName = strArguments;
-                                methods.Add(methodName, new Method());
+                                CreateMethod(strArgument);
                                 methodFlag = true;
                                 break;
                             case "loop":
@@ -245,7 +248,7 @@ namespace GraphicalProgrammingLanguage
                                 break;
                             case "if":
                                 ifFlag = true;
-                                if (checkCondition(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()))
+                                if (CheckCondition(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()))
                                     executeIf = true;
                                 break;
                             default:
@@ -373,10 +376,27 @@ namespace GraphicalProgrammingLanguage
             return parsed;
         }
 
-        public bool checkCondition(String[] condition)
+        public bool CheckCondition(String[] condition)
         {
             Expression e = new Expression(condition);
             return e.EvaluateTruth();
+        }
+
+        public void CreateMethod(String arg)
+        {
+            //If no arguments provided, create Method and return.
+            if (arg.IndexOf('(') < 0)
+            {
+                methods.Add(arg, new Method());
+                return;
+            }
+
+            //Otherwise, separate Method name, create ParamMethod and pass variables for creation.
+            ParamMethod m = new ParamMethod();
+            String[] parameters = arg.Substring(arg.IndexOf('(') + 1, arg.Length - 1).Split(',');
+            m.CreateVariables(parameters);
+            methods.Add(arg.Substring(0, arg.IndexOf('(')), m);
+
         }
     }
 }

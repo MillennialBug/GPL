@@ -8,7 +8,8 @@ namespace GraphicalProgrammingLanguage
     public class Validator
     {
         public static Regex oneArg = new Regex("^(\\d+|[a-zA-Z]+)$");
-        public static Regex oneWord = new Regex("^([a-zA-Z])+$");
+        public static Regex oneWord = new Regex("^[a-zA-Z]+$");
+        public static Regex paramMethod = new Regex("^([a-zA-Z]+)(?:(?:\\([a-zA-Z]+\\))|(?:\\(([a-zA-Z]+)(?:, [a-zA-Z]+)+\\)))$");
         public static Regex twoArgs = new Regex("^(\\d+|[a-zA-Z]+),(\\d+|[a-zA-Z]+)$");
         public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s<>]");
         public static Regex comparrison = new Regex("[==|>=|<=|>|<]{1}");
@@ -25,8 +26,9 @@ namespace GraphicalProgrammingLanguage
             { "drawto", twoArgs },
             { "var", oneWord },
             { "math", new Regex("^(\\+|\\*|\\\\|\\-|=)$") },
+            { "loop", oneArg },
             { "method", oneWord },
-            { "loop", oneArg }
+            { "paramMethod", paramMethod }
         };
         public static List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
         public static List<String> commands = new List<String>() { "moveto", "drawto", "pen", "fill", "var", "method", "loop", "if"};
@@ -52,6 +54,12 @@ namespace GraphicalProgrammingLanguage
                     throw new GPLException("Invalid character found in command.");
             }
 
+            if (cmd[0].Equals("method"))
+            {
+                ValidateMethod(cmd, variables, methods);
+                return;
+            }
+                
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && !singleWordCommands.Contains(cmd[0]) && !methods.Contains(cmd[0]) && !variables.Contains(cmd[0]))
             {
                 String variableName = cmd[0].Substring(0, cmd[0].Length - 2);
@@ -81,13 +89,6 @@ namespace GraphicalProgrammingLanguage
                         throw new GPLException("Variable " + cmd[0] + " does not exist and cannot be assigned a value.");
                     else
                         ValidateVariableAssignment(cmd, variables);
-
-                // If creating method, check it does not exist.
-                if (cmd[0].Equals("method") && methods.Contains(cmd[1]))
-                    throw new GPLException("Method " + cmd[1] + " already exists");
-                // Check that method is not a command/variable name.
-                else if (cmd[0].Equals("method") && (shapes.Contains(cmd[1]) || commands.Contains(cmd[1]) || singleWordCommands.Contains(cmd[1]) || variables.Contains(cmd[1])))
-                    throw new GPLException("Mathod name cannot be the same as an existing command or variable.");
 
                 ValidateArgs(cmd[0], new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>());
             }
@@ -157,6 +158,47 @@ namespace GraphicalProgrammingLanguage
         public bool IsShape(String cmd)
         {
             return shapes.Contains(cmd);
+        }
+
+        public void ValidateMethod(String[] cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods)
+        {
+            if (cmd.Length < 2)
+                throw new GPLException("No arguments provided.");
+
+            String methodName;
+            bool paramMethod = false;
+
+            //Check if parameters have been supplied by looking for an open bracket.
+            //This will help extract the method name and decide what type of method to create.
+            if (cmd[1].IndexOf('(') >= 0)
+            {
+                methodName = cmd[1].Substring(0, cmd[1].IndexOf('('));
+                paramMethod = true;
+            }
+            else
+                methodName = cmd[1];
+
+            // Check method doesn't already exist.
+            if (methods.Contains(methodName))
+                throw new GPLException("Method " + cmd[1] + " already exists");
+            // Check that method is not a command/variable name.
+            else if (shapes.Contains(methodName) || commands.Contains(methodName) || singleWordCommands.Contains(methodName) || variables.Contains(methodName))
+                throw new GPLException("Method name cannot be the same as an existing command or variable.");
+
+            if (paramMethod)
+            {
+                //If it's a parameterised method we need to rebuild the argument string for Regex validation.
+                String p = "";
+                foreach(String s in new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>())
+                {
+                    p += s + " ";
+                }
+                ValidateArgs("paramMethod", p.Trim().Split('\n'));
+            }
+            else
+            {
+                ValidateArgs(cmd[0], new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>());
+            }
         }
     }
 }

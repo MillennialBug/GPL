@@ -30,7 +30,7 @@ namespace GraphicalProgrammingLanguage
             paintingCanvas.RestoreDefaultState();
             CheckButton_Click(sender, e);
             if (cleanProgram)
-                parser.parseLines(programBox.Lines, true);
+                parser.ParseLines(programBox.Lines, true);
             else
                 MessageBox.Show("The program contains errors.\n\nPlease correct before running.", "Errors Found");
             Refresh();
@@ -50,7 +50,7 @@ namespace GraphicalProgrammingLanguage
                     RunButton_Click(sender, e);
                 else
                 {
-                    commandException.Lines = parser.parseLines(commandBox.Lines, true);
+                    commandException.Lines = parser.ParseLines(commandBox.Lines, true);
                 }
                 
                 if (commandException.Text == String.Empty) commandBox.Text = "";
@@ -105,7 +105,7 @@ namespace GraphicalProgrammingLanguage
             {
                 programBox.Clear();
                 exceptionBox.Clear();
-                parser.parseLines("clear\nreset".Split('\n'), true);
+                parser.ParseLines("clear\nreset".Split('\n'), true);
                 Refresh();
             }  
         }
@@ -113,7 +113,7 @@ namespace GraphicalProgrammingLanguage
         private void CheckButton_Click(object sender, EventArgs e)
         {
             //Check code for errors
-            exceptionBox.Lines = parser.parseLines(programBox.Lines, false);
+            exceptionBox.Lines = parser.ParseLines(programBox.Lines, false);
             CheckProgramIsClean();
             Refresh();
         }
