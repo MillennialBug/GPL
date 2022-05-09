@@ -38,6 +38,10 @@ namespace GPLNUnitTests
             variables = variablesDict.Keys;
         }
 
+        /// <summary>
+        /// Tests that valid single word commands pass validation.
+        /// </summary>
+        /// <param name="s">Valid single word command.</param>
         [TestCaseSource(nameof(SingleWordCommandCases))]
         public void ValidOneWordCommands(String s)
         {
@@ -48,6 +52,10 @@ namespace GPLNUnitTests
             validator.ValidateCommand(singleWordCommand, variables, methods);
         }
 
+        /// <summary>
+        /// Tests that variables can be successfully assigned a value with a valid command.
+        /// </summary>
+        /// <param name="s">Variable assignment command E.G. "one = 1"</param>
         [TestCaseSource(nameof(VariableAssignmentCommandCases))]
         public void ValidVariableAssignmentCommand(String s)
         {
@@ -58,6 +66,9 @@ namespace GPLNUnitTests
             validator.ValidateCommand(multiPartProgramline, variables, methods);
         }
 
+        /// <summary>
+        /// Tests that exception is thrown when a variable used for assignment does not exist.
+        /// </summary>
         [Test]
         public void AssignmentVariableDoesNotExist()
         {
@@ -78,6 +89,9 @@ namespace GPLNUnitTests
             Assert.Fail();
         }
 
+        /// <summary>
+        /// Tests that commands containing invalid characters throw an exception.
+        /// </summary>
         [Test]
         public void CommandWithInvalidChar()
         {
@@ -98,6 +112,10 @@ namespace GPLNUnitTests
             Assert.Fail();
         }
 
+        /// <summary>
+        /// Tests that a command that requires arguments throws an exception when no args provided.
+        /// </summary>
+        /// <param name="s"></param>
         [TestCaseSource(nameof(InvalidSingleWordCommandCases))]
         [TestCaseSource(nameof(ShapeCommandWordCases))]
         public void ValidCommandRequiringArgsNoArgs(String s)
@@ -109,29 +127,16 @@ namespace GPLNUnitTests
             try
             {
                 validator.ValidateCommand(singleWordCommand, variables, methods);
-                return;
             }
             catch(GPLException ex)
             {
                 Assert.That(ex.Message, Is.EqualTo("No arguments provided."));
-                return;
             }
-
-            //Assert
-            Assert.Fail();
-
         }
 
-        [Test]
-        public void VariableDeclaredDoesNotExist()
-        {
-            //Arrange
-            multiPartProgramline = "var newvariable".Split(' ');
-
-            //Act
-            validator.ValidateCommand(multiPartProgramline, variables, methods);
-        }
-
+        /// <summary>
+        /// Tests a variable cannot be declared twice.
+        /// </summary>
         [Test]
         public void VariableDeclareAlreadyExists()
         {
@@ -142,18 +147,18 @@ namespace GPLNUnitTests
             try
             {
                 validator.ValidateCommand(multiPartProgramline, variables, methods);
-                return;
             }
             catch(GPLException ex)
             {
                 //Assert
                 Assert.That(ex.Message, Is.EqualTo("Variable " + multiPartProgramline[1] + " already exists"));
-                return;
             }
-
-            Assert.Fail();
         }
 
+        /// <summary>
+        /// Tests that Polygons must have at least 5 sides.
+        /// </summary>
+        /// <param name="i"></param>
         [TestCaseSource(nameof(SingleIntegerCases))]
         public void ValidatePolygonNumberOfSides(int i)
         {
@@ -164,16 +169,18 @@ namespace GPLNUnitTests
             try
             {
                 validator.ValidateCommand(multiPartProgramline, variables, methods);
-                return;
             }
             catch (GPLException ex)
             {
                 //Assert
                 Assert.That(ex.Message, Is.EqualTo("polygon must have more than 4 points/sides."));
-                return;
             }
         }
 
+        /// <summary>
+        /// Tests that Stars must have at least 5 points.
+        /// </summary>
+        /// <param name="i"></param>
         [TestCaseSource(nameof(SingleIntegerCases))]
         public void ValidateStarNumberOfPoints(int i)
         {
@@ -194,6 +201,10 @@ namespace GPLNUnitTests
             }
         }
 
+        /// <summary>
+        /// Tests a set of valid commands pass validation.
+        /// </summary>
+        /// <param name="s"></param>
         [TestCaseSource(nameof(ValidCommands))]
         public void ValidArgs(String s)
         {
@@ -213,6 +224,9 @@ namespace GPLNUnitTests
             
         }
 
+        /// <summary>
+        /// Tests that variables cannot be named the same as an existing command or method.
+        /// </summary>
         [Test]
         public void VariableNameNotCommand()
         {
@@ -234,6 +248,9 @@ namespace GPLNUnitTests
             Assert.Fail();
         }
 
+        /// <summary>
+        /// Tests that methods cannot be named the same as an existing command or variable.
+        /// </summary>
         [Test]
         public void MethodNameNotCommand()
         {
@@ -255,6 +272,10 @@ namespace GPLNUnitTests
             Assert.Fail();
         }
 
+        /// <summary>
+        /// Tests that IsShape returns true when passed the name of a valid shape.
+        /// </summary>
+        /// <param name="s"></param>
         [TestCaseSource(nameof(ShapeCommandWordCases))]
         public void IsShapeReturnsTrueForValidShape(String s)
         {
@@ -262,12 +283,29 @@ namespace GPLNUnitTests
                 Assert.Fail();
         }
 
+        [TestCase("two++")]
+        [TestCase("two--")]
+        public void ValidatesIncrementOrDecrementCommand(String s)
+        {
+            //Arrange
+            singleWordCommand = s.Split(' ');
+
+            //Act
+            validator.ValidateCommand(singleWordCommand, variables, methods);
+        }
+
+        /// <summary>
+        /// Valid variable assignment comamnds.
+        /// </summary>
         static string[] VariableAssignmentCommandCases =
         {
             "two = 2",
             "three = three"
         };
 
+        /// <summary>
+        /// A set of valid commands with valid arguments.
+        /// </summary>
         static string[] ValidCommands =
         {
             "circle two",
@@ -276,7 +314,8 @@ namespace GPLNUnitTests
             "triangle 50",
             "polygon 7,50",
             "loop 2",
-            "loop two"
+            "loop two",
+            "if two == 2"
         };
 
         static string[] SingleWordCommandCases = Validator.singleWordCommands.ToArray();

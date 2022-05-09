@@ -22,6 +22,10 @@ namespace GPLNUnitTests
             exceptions = new string[10];
         }
 
+        /// <summary>
+        /// Tests that GetIntArgs returns Integer values when given simple input.
+        /// </summary>
+        /// <param name="s">Two integers in a string, seperated by a comma.</param>
         [Test]
         [TestCase("2,3")]
         public void ReturnsValidIntArgs(String s)
@@ -34,6 +38,9 @@ namespace GPLNUnitTests
             Assert.That(list[1], Is.EqualTo(3));
         }
 
+        /// <summary>
+        /// Tests that GetIntArgs returns Integer values from variable names.
+        /// </summary>
         [Test]
         public void ReturnsValidVarArgsAsInts()
         {
@@ -48,6 +55,10 @@ namespace GPLNUnitTests
             Assert.That(list[1], Is.EqualTo(2));
         }
 
+        /// <summary>
+        /// Tests the various methods in Parser that realte to Variables.
+        /// </summary>
+        /// <param name="s">A program in a single string. Commands are seperated by newline characters.</param>
         [TestCase("var one\nvar two\none = 1\ntwo = one + one")]
         public void ParserVariableMethods(String s) 
         {
@@ -61,6 +72,9 @@ namespace GPLNUnitTests
             Assert.That(two.GetValue(), Is.EqualTo(2));
         }
 
+        /// <summary>
+        /// Tests the various methods in Parser that realte to Methods.
+        /// </summary>
         [Test]
         public void ParserMethodMethods()
         {
@@ -75,7 +89,9 @@ namespace GPLNUnitTests
             Assert.That(m.GetBodyAsArray()[1], Is.EqualTo("circle 75"));
         }
 
-        //public String GetParsedExpression(String[] expression)
+        /// <summary>
+        /// Tests that GetParsedExpression returns a translated experssion. I.E. Variable names are swapped for their respective values.
+        /// </summary>
         [Test]
         public void GetParsedExpression()
         {
@@ -87,6 +103,64 @@ namespace GPLNUnitTests
 
             //Assert
             Assert.That(s, Is.EqualTo("1 + 1 "));
+        }
+
+        /// <summary>
+        /// Tests that an If's body executes when the condition is True.
+        /// </summary>
+        [Test]
+        public void IfExecutesWhenConditionTrue()
+        {
+            //Arrange
+            parser.parseLines("var a\nvar b\na = 1\nif a == 1\nb = 2\nendif".Split('\n'), true);
+
+            //Act
+            Variable b = parser.GetVariable("b");
+
+            //Assert
+            Assert.That(b.GetValue(), Is.EqualTo(2));
+        }
+
+        /// <summary>
+        /// Tests that an If's body does not execute when the condition is False.
+        /// </summary>
+        [Test]
+        public void IfDoesNotExecuteWhenConditionFalse()
+        {
+            //Arrange
+            parser.parseLines("var a\nvar b\na = 1\nif a == 0\nb = 2\nendif".Split('\n'), true);
+
+            //Act
+            Variable b = parser.GetVariable("b");
+
+            //Assert
+            Assert.That(b.GetValue(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void IncrementAddsOneToVariable()
+        {
+            //Arrange
+            parser.parseLines("var a\na = 1\na++".Split('\n'), true);
+
+            //Act
+            Variable a = parser.GetVariable("a");
+
+            //Assert
+            Assert.That(a.GetValue, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void DecrementTakesOneFromVariable()
+        {
+            //Arrange
+            parser.parseLines("var a\na = 2\na--".Split('\n'), true);
+
+            //Act
+            Variable a = parser.GetVariable("a");
+
+            //Assert
+            Assert.That(a.GetValue, Is.EqualTo(1));
         }
     }
 }

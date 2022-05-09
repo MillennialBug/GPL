@@ -95,17 +95,17 @@ namespace GraphicalProgrammingLanguage
                         {
                             throw new GPLException("Command '" + command + "' cannot be used within an if.");
                         }
-                            
-                        if (!executeIf)
-                        {
-                            exceptionsList.Add(String.Empty);
-                            continue;
-                        }
 
                         if (command.Equals("endif"))
                         {
                             ifFlag = false;
                             executeIf = false;
+                            exceptionsList.Add(String.Empty);
+                            continue;
+                        }
+
+                        if (!executeIf)
+                        {
                             exceptionsList.Add(String.Empty);
                             continue;
                         }
@@ -170,6 +170,20 @@ namespace GraphicalProgrammingLanguage
                         if (execute) SetVariableValue(command, new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
                         if (!nestedExec) exceptionsList.Add(String.Empty);
                         continue;
+                    }
+
+                    if (VariableExists(command.Substring(0,command.Length-2)))
+                    {
+                        String name = command.Substring(0, command.Length - 2);
+
+                        if (command.Substring(command.Length - 2, 2).Equals("++"))
+                        {
+                            if (execute) { SetVariableValue(name, (name + " + 1").Split(' ')); continue; }
+                        }
+                        else if (command.Substring(command.Length - 2, 2).Equals("--"))
+                        {
+                            if (execute) { SetVariableValue(name, (name + " - 1").Split(' ')); continue; }
+                        }
                     }
 
                     if (validator.IsShape(command))

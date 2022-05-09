@@ -10,8 +10,8 @@ namespace GraphicalProgrammingLanguage
         public static Regex oneArg = new Regex("^(\\d+|[a-zA-Z]+)$");
         public static Regex oneWord = new Regex("^([a-zA-Z])+$");
         public static Regex twoArgs = new Regex("^(\\d+|[a-zA-Z]+),(\\d+|[a-zA-Z]+)$");
-        public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s]");
-        public static Regex comparrison = new Regex("[==|=>|<=|>|<]{1}");
+        public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s<>]");
+        public static Regex comparrison = new Regex("[==|>=|<=|>|<]{1}");
         public static Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
             { "circle",  oneArg }, 
             { "rectangle", twoArgs }, 
@@ -53,7 +53,13 @@ namespace GraphicalProgrammingLanguage
             }
 
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && !singleWordCommands.Contains(cmd[0]) && !methods.Contains(cmd[0]) && !variables.Contains(cmd[0]))
-                throw new GPLException("Bad command found: " + cmd[0]);
+            {
+                String variableName = cmd[0].Substring(0, cmd[0].Length - 2);
+                String op = cmd[0].Substring(cmd[0].Length - 2, 2);
+                if (!(variables.Contains(variableName) && (op.Equals("++") || op.Equals("--"))))
+                    throw new GPLException("Bad command found: " + cmd[0]);
+                else return;
+            }
 
             // Only single word lines should be reset, clear, endmethod or defined methods.
             if (!singleWordCommands.Contains(cmd[0]) && !methods.Contains(cmd[0]) && cmd.Length < 2)
@@ -65,8 +71,10 @@ namespace GraphicalProgrammingLanguage
                 if (cmd[0].Equals("var") && variables.Contains(cmd[1]))
                     throw new GPLException("Variable " + cmd[1] + " already exists");
                 // Check that variable is not a command/method name.
-                else if (cmd[0].Equals("var") &&  (shapes.Contains(cmd[1]) || commands.Contains(cmd[1]) || singleWordCommands.Contains(cmd[1]) || methods.Contains(cmd[1])))
+                else if (cmd[0].Equals("var") && (shapes.Contains(cmd[1]) || commands.Contains(cmd[1]) || singleWordCommands.Contains(cmd[1]) || methods.Contains(cmd[1])))
                     throw new GPLException("Variable name cannot be the same as an existing command or method.");
+                else if (variables.Contains(cmd[0]) && !cmd[1].Equals("="))
+                    throw new GPLException("Invalid variable assignment.");
                 // Check if variable exists for assingment
                 else if (cmd[1].Equals("="))
                     if (!variables.Contains(cmd[0]))
