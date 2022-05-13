@@ -184,7 +184,7 @@ namespace GPLNUnitTests
         }
 
         [Test]
-        public void ExecutesParamMethodNoParams()
+        public void ExecutesParamMethodNoParamsUsed()
         {
             //Arrange
             String[] program = "method mymethod(one, two, three)\ncircle 50\ncircle 75\nendmethod\nmymethod(1, 2, 3)".Split('\n');

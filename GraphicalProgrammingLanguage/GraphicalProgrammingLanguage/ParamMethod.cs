@@ -39,5 +39,10 @@ namespace GraphicalProgrammingLanguage
             else
                 throw new GPLException("Method Variable '" + name + "' does not exists'.");
         }
+
+        public int GetVariableCount()
+        {
+            return methodVariables.Count;
+        }
     }
 }

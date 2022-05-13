@@ -89,14 +89,16 @@ namespace GraphicalProgrammingLanguage
                 {
                     //Grab the method name.
                     command = parts[0].Substring(0, parts[0].IndexOf('('));
-                    strArgument = concatArgument(parts);
+                    //Grab the arguments.
+                    strArgument = ExtractMethodCallParameters(parts);
                 }
                 else
                 {
                     //Otherwise, first part should be the command name as it is.
                     command = parts[0];
                     if (command.Equals("method"))
-                        strArgument = concatArgument(parts);
+                        //If we're defining a method, the remaining part of the line should be the name and parameters.
+                        strArgument = concatArgument(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray());
                     else
                         //Second part of a 2 part command should be the arguments. There should be no spaces provided.
                         strArgument = parts.Length == 2 ? parts[1] : String.Empty;
@@ -185,7 +187,7 @@ namespace GraphicalProgrammingLanguage
                     if (MethodExists(command))
                     {
                         Method m = GetMethod(command);
-                        if (m.RequiresVariables()) CheckVariablesSuppliedToMethod(m, strArgument);
+                        if (m.RequiresVariables()) CheckVariablesSuppliedToMethod((ParamMethod) m, strArgument);
                         ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod) m);
                         if (!nestedExec) exceptionsList.Add(String.Empty);
                         continue;
@@ -290,15 +292,28 @@ namespace GraphicalProgrammingLanguage
             return exceptionsList.ToArray();
         }
 
-        private void CheckVariablesSuppliedToMethod(Method m, string strArgument)
+        private string ExtractMethodCallParameters(string[] parts)
         {
-            throw new NotImplementedException();
+            foreach (String s in parts)
+            {
+                if (s.IndexOf('(') > 0)
+                    strArgument += s.Substring(s.IndexOf('(') + 1);
+                else
+                    strArgument += s + " ";
+            }
+            return strArgument.Trim();
+        }
+
+        private void CheckVariablesSuppliedToMethod(ParamMethod m, string strArgument)
+        {
+            if (!(m.GetVariableCount() == ExtractParameterNamesFromCSVString(strArgument).Length))
+                throw new GPLException("Incorrect number of parameters passed to Method");
         }
 
         private string concatArgument(string[] parts)
         {
             //Compile the remaining arguments into a single string
-            foreach (String s in new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray())
+            foreach (String s in parts)
             {
                 strArgument += s + " ";
             }
@@ -430,10 +445,14 @@ namespace GraphicalProgrammingLanguage
 
             //Otherwise, separate Method name, create ParamMethod and pass variables for creation.
             ParamMethod m = new ParamMethod();
-            String[] parameters = arg.Substring(arg.IndexOf('(') + 1, arg.IndexOf(')') - (arg.IndexOf('(') + 1)).Split(',');
-            m.CreateVariables(parameters);
+            m.CreateVariables(ExtractParameterNamesFromCSVString(arg));
             methods.Add(arg.Substring(0, arg.IndexOf('(')), m);
 
+        }
+
+        public String[] ExtractParameterNamesFromCSVString(String arg)
+        {
+            return arg.Substring(arg.IndexOf('(') + 1, arg.IndexOf(')') - (arg.IndexOf('(') + 1)).Split(',');
         }
     }
 }
