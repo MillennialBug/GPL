@@ -9,7 +9,7 @@ namespace GraphicalProgrammingLanguage
     {
         public static Regex oneArg = new Regex("^(\\d+|[a-zA-Z]+)$");
         public static Regex oneWord = new Regex("^[a-zA-Z]+$");
-        public static Regex paramMethod = new Regex("^([a-zA-Z]+)(?:(?:\\([a-zA-Z]+\\))|(?:\\(([a-zA-Z]+)(?:, [a-zA-Z]+)+\\)))$");
+        public static Regex paramMethod = new Regex("^([a-zA-Z]+)(?:(?:\\([a-zA-Z]+\\))|(?:\\(([a-zA-Z]+)(?:, *[a-zA-Z]+)+\\)))$");
         public static Regex twoArgs = new Regex("^(\\d+|[a-zA-Z]+),(\\d+|[a-zA-Z]+)$");
         public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s<>]");
         public static Regex comparrison = new Regex("[==|>=|<=|>|<]{1}");
@@ -53,12 +53,6 @@ namespace GraphicalProgrammingLanguage
                 if (invalidChars.IsMatch(s))
                     throw new GPLException("Invalid character found in command.");
             }
-
-            if (cmd[0].Equals("method"))
-            {
-                ValidateMethod(cmd, variables, methods);
-                return;
-            }
                 
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && !singleWordCommands.Contains(cmd[0]) && !methods.Contains(cmd[0]) && !variables.Contains(cmd[0]))
             {
@@ -66,7 +60,8 @@ namespace GraphicalProgrammingLanguage
                 String op = cmd[0].Substring(cmd[0].Length - 2, 2);
                 if (!(variables.Contains(variableName) && (op.Equals("++") || op.Equals("--"))))
                     throw new GPLException("Bad command found: " + cmd[0]);
-                else return;
+                else 
+                    return;
             }
 
             // Only single word lines should be reset, clear, endmethod or defined methods.
@@ -160,45 +155,34 @@ namespace GraphicalProgrammingLanguage
             return shapes.Contains(cmd);
         }
 
-        public void ValidateMethod(String[] cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods)
+        public String ValidateMethod(String cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods)
         {
-            if (cmd.Length < 2)
-                throw new GPLException("No arguments provided.");
-
             String methodName;
             bool paramMethod = false;
 
             //Check if parameters have been supplied by looking for an open bracket.
             //This will help extract the method name and decide what type of method to create.
-            if (cmd[1].IndexOf('(') >= 0)
+            if (cmd.IndexOf('(') >= 0)
             {
-                methodName = cmd[1].Substring(0, cmd[1].IndexOf('('));
+                methodName = cmd.Substring(0, cmd.IndexOf('('));
                 paramMethod = true;
             }
             else
-                methodName = cmd[1];
+                methodName = cmd;
 
             // Check method doesn't already exist.
             if (methods.Contains(methodName))
-                throw new GPLException("Method " + cmd[1] + " already exists");
+                throw new GPLException("Method " + cmd + " already exists");
             // Check that method is not a command/variable name.
             else if (shapes.Contains(methodName) || commands.Contains(methodName) || singleWordCommands.Contains(methodName) || variables.Contains(methodName))
                 throw new GPLException("Method name cannot be the same as an existing command or variable.");
 
             if (paramMethod)
-            {
-                //If it's a parameterised method we need to rebuild the argument string for Regex validation.
-                String p = "";
-                foreach(String s in new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>())
-                {
-                    p += s + " ";
-                }
-                ValidateArgs("paramMethod", p.Trim().Split('\n'));
-            }
+                ValidateArgs("paramMethod", cmd.Trim().Split('\n'));
             else
-            {
-                ValidateArgs(cmd[0], new ArraySegment<string>(cmd, 1, cmd.GetLength(0) - 1).ToArray<String>());
-            }
+                ValidateArgs("method", cmd.Trim().Split('\n'));
+
+            return methodName;
         }
     }
 }

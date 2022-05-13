@@ -6,6 +6,7 @@ namespace GraphicalProgrammingLanguage
     public class Method
     {
         private List<String> body;
+        protected bool requiresVariables = false;
 
         public Method()
         {
@@ -20,6 +21,11 @@ namespace GraphicalProgrammingLanguage
         public String[] GetBodyAsArray()
         {
             return body.ToArray();
+        }
+
+        public bool RequiresVariables()
+        {
+            return this.requiresVariables;
         }
     }
 }

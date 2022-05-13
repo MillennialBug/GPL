@@ -260,7 +260,7 @@ namespace GPLNUnitTests
             //Act
             try
             {
-                validator.ValidateCommand(multiPartProgramline, variables, methods);
+                validator.ValidateMethod(multiPartProgramline[1], variables, methods);
             }
             catch (GPLException ex)
             {
@@ -270,6 +270,19 @@ namespace GPLNUnitTests
             }
 
             Assert.Fail();
+        }
+
+        [Test]
+        public void ValidatesParamMethodCommand()
+        {
+            //Arrange
+            String program = "myparammethod(one, two, three)";
+
+            //Act
+            String methodName = validator.ValidateMethod(program, variables, methods);
+
+            //Assert
+            Assert.That(methodName, Is.EqualTo("myparammethod"));
         }
 
         /// <summary>

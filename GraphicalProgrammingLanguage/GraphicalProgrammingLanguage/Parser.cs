@@ -53,7 +53,7 @@ namespace GraphicalProgrammingLanguage
         /// <param name="execute">Boolean determining if the commands should be executed (True), or just validated (False).</param>
         /// <param name="nestedExec">Boolean to determine if execution is nested. This stops lists being destroyed. Default False.</param>
         /// <returns>String array holding any exceptions caused by the user inputted commands.</returns>
-        public String[] ParseLines(String[] lines, Boolean execute, Boolean nestedExec = false)
+        public String[] ParseLines(String[] lines, Boolean execute, Boolean nestedExec = false, ParamMethod methodExecuting = null)
         {
             if (!nestedExec)
             {
@@ -71,28 +71,48 @@ namespace GraphicalProgrammingLanguage
 
             foreach (String line in lines)
             {
+                //Trim unnecessary whitespace.
                 trimmed = line.Trim(' ');
+
+                //If the string is empty now, it's a blank line and should be ignored.
                 if (trimmed.Equals(String.Empty))
                 {
                     exceptionsList.Add(String.Empty);
                     continue;
                 }
 
+                //Split the remaining string at each space.
                 parts = trimmed.Split(' ');
 
+                //If there's a bracket in the first part, user should be calling a paramMethod
                 if (parts[0].IndexOf('(') > 0)
-                    command = parts[0].Substring(0, parts[0].IndexOf('('));
-                else
-                    command = parts[0];
-
-                strArgument = "";
-
-                if (parts.Length == 2) strArgument = parts[1];
-                try
                 {
-                    if (!methods.ContainsKey(command))
-                        validator.ValidateCommand(parts, variables.Keys, methods.Keys);
+                    //Grab the method name.
+                    command = parts[0].Substring(0, parts[0].IndexOf('('));
+                    strArgument = concatArgument(parts);
+                }
+                else
+                {
+                    //Otherwise, first part should be the command name as it is.
+                    command = parts[0];
+                    if (command.Equals("method"))
+                        strArgument = concatArgument(parts);
+                    else
+                        //Second part of a 2 part command should be the arguments. There should be no spaces provided.
+                        strArgument = parts.Length == 2 ? parts[1] : String.Empty;
+                }
+                    
 
+                try
+                {                    
+                    if (!methods.ContainsKey(command))
+                    {
+                        if (command.Equals("method"))
+                            methodName = validator.ValidateMethod(strArgument, variables.Keys, methods.Keys);
+                        else
+                            validator.ValidateCommand(parts, variables.Keys, methods.Keys);
+                    }
+                        
                     if (ifFlag)
                     {
                         if (command.Equals("method") || command.Equals("var"))
@@ -164,7 +184,9 @@ namespace GraphicalProgrammingLanguage
 
                     if (MethodExists(command))
                     {
-                        ParseLines(GetMethod(command).GetBodyAsArray(), execute, true);
+                        Method m = GetMethod(command);
+                        if (m.RequiresVariables()) CheckVariablesSuppliedToMethod(m, strArgument);
+                        ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod) m);
                         if (!nestedExec) exceptionsList.Add(String.Empty);
                         continue;
                     }
@@ -266,6 +288,21 @@ namespace GraphicalProgrammingLanguage
             }
 
             return exceptionsList.ToArray();
+        }
+
+        private void CheckVariablesSuppliedToMethod(Method m, string strArgument)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string concatArgument(string[] parts)
+        {
+            //Compile the remaining arguments into a single string
+            foreach (String s in new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray())
+            {
+                strArgument += s + " ";
+            }
+            return strArgument.Trim();
         }
 
         /// <summary>
@@ -384,7 +421,7 @@ namespace GraphicalProgrammingLanguage
 
         public void CreateMethod(String arg)
         {
-            //If no arguments provided, create Method and return.
+            //If no parameters provided, create Method and return.
             if (arg.IndexOf('(') < 0)
             {
                 methods.Add(arg, new Method());
@@ -393,7 +430,7 @@ namespace GraphicalProgrammingLanguage
 
             //Otherwise, separate Method name, create ParamMethod and pass variables for creation.
             ParamMethod m = new ParamMethod();
-            String[] parameters = arg.Substring(arg.IndexOf('(') + 1, arg.Length - 1).Split(',');
+            String[] parameters = arg.Substring(arg.IndexOf('(') + 1, arg.IndexOf(')') - (arg.IndexOf('(') + 1)).Split(',');
             m.CreateVariables(parameters);
             methods.Add(arg.Substring(0, arg.IndexOf('(')), m);
 

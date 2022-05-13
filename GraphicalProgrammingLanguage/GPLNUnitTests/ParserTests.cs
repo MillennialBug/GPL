@@ -162,5 +162,41 @@ namespace GPLNUnitTests
             //Assert
             Assert.That(a.GetValue, Is.EqualTo(1));
         }
+
+        [Test]
+        public void ParsesParamMethod()
+        {
+            //Arrange
+            String[] program = "method mymethod(one, two, three)\ncircle 50\ncircle 75\nendmethod".Split('\n');
+
+            //Act
+            parser.ParseLines(program, true);
+
+            //Assert
+            Assert.That(parser.MethodExists("mymethod"), Is.True);
+            ParamMethod m = (ParamMethod) parser.GetMethod("mymethod");
+            Assert.That(m.GetBodyAsArray().Length, Is.EqualTo(2));
+            Assert.That(m.GetBodyAsArray()[0], Is.EqualTo("circle 50"));
+            Assert.That(m.GetBodyAsArray()[1], Is.EqualTo("circle 75"));
+            Assert.That(m.HasVariable("one"), Is.True);
+            Assert.That(m.HasVariable("two"), Is.True);
+            Assert.That(m.HasVariable("three"), Is.True);
+        }
+
+        [Test]
+        public void ExecutesParamMethodNoParams()
+        {
+            //Arrange
+            String[] program = "method mymethod(one, two, three)\ncircle 50\ncircle 75\nendmethod\nmymethod(1, 2, 3)".Split('\n');
+
+            //Act
+            String[] exceptions = parser.ParseLines(program, false);
+
+            //Assert
+            foreach(String s in exceptions)
+            {
+                Assert.That(s, Is.EqualTo(String.Empty));
+            }
+        }
     }
 }
