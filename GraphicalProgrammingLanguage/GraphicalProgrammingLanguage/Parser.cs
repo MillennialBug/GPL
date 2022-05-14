@@ -71,6 +71,9 @@ namespace GraphicalProgrammingLanguage
 
             foreach (String line in lines)
             {
+                command = String.Empty;
+                strArgument = String.Empty;
+
                 //Trim unnecessary whitespace.
                 trimmed = line.Trim(' ');
 
@@ -85,7 +88,7 @@ namespace GraphicalProgrammingLanguage
                 parts = trimmed.Split(' ');
 
                 //If there's a bracket in the first part, user should be calling a paramMethod
-                if (parts[0].IndexOf('(') > 0)
+                if (parts[0].IndexOf('(') >= 0)
                 {
                     //Grab the method name.
                     command = parts[0].Substring(0, parts[0].IndexOf('('));
@@ -187,36 +190,43 @@ namespace GraphicalProgrammingLanguage
                     if (MethodExists(command))
                     {
                         Method m = GetMethod(command);
-                        if (m.RequiresVariables()) CheckVariablesSuppliedToMethod((ParamMethod) m, strArgument);
-                        ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod) m);
+                        if (m.RequiresVariables())
+                        {
+                            CheckVariablesSuppliedToMethod((ParamMethod) m, strArgument);
+                            SetMethodVariables((ParamMethod)m, strArgument);
+                            ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod)m);
+                        }
+                        else
+                            ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod) m);
+
                         if (!nestedExec) exceptionsList.Add(String.Empty);
                         continue;
                     }
 
                     if (VariableExists(command))
                     {
-                        if (execute) SetVariableValue(command, new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>());
+                        if (execute) SetVariableValue(command, new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>(), methodExecuting);
                         if (!nestedExec) exceptionsList.Add(String.Empty);
                         continue;
                     }
 
-                    if (VariableExists(command.Substring(0,command.Length-2)))
+                    if (VariableExists(command.Substring(0,command.Length-2)) || methodExecuting != null)
                     {
                         String name = command.Substring(0, command.Length - 2);
 
                         if (command.Substring(command.Length - 2, 2).Equals("++"))
                         {
-                            if (execute) { SetVariableValue(name, (name + " + 1").Split(' ')); continue; }
+                            if (execute) { SetVariableValue(name, (name + " + 1").Split(' '), methodExecuting); continue; }
                         }
                         else if (command.Substring(command.Length - 2, 2).Equals("--"))
                         {
-                            if (execute) { SetVariableValue(name, (name + " - 1").Split(' ')); continue; }
+                            if (execute) { SetVariableValue(name, (name + " - 1").Split(' '), methodExecuting); continue; }
                         }
                     }
 
                     if (validator.IsShape(command))
                     {
-                        args = this.GetIntArgs(strArgument);
+                        args = this.GetIntArgs(strArgument, methodExecuting);
                         if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args[0]);
                         if (command.Equals("square")) args.Add(args[0]); //Adds size of square again so Rectangle can be re-used.
                         if (execute) canvas.DrawShape(shapeFactory.GetShape(command), args);
@@ -291,25 +301,55 @@ namespace GraphicalProgrammingLanguage
 
             return exceptionsList.ToArray();
         }
+        /// <summary>
+        /// Sets the value of variables held within a method.
+        /// </summary>
+        /// <param name="m">Method to set variables in.</param>
+        /// <param name="strArgument">String containing comma separated variable values/expressions.</param>
+        private void SetMethodVariables(ParamMethod m, string strArgument)
+        {
+            int i = 0;
+            String[] variableAssignments = ExtractParameterNamesFromCSVString(strArgument);
+            foreach(String s in variableAssignments)
+            {
+                m.SetMethodVariableValue(m.GetVariableNameFromPosition(i++), s.Split(' '));
+            }
+        }
 
+        /// <summary>
+        /// Seperates the parameters from a method call.
+        /// </summary>
+        /// <param name="parts">Program line split by ' ' into an array. </param>
+        /// <returns>String</returns>
         private string ExtractMethodCallParameters(string[] parts)
         {
             foreach (String s in parts)
             {
-                if (s.IndexOf('(') > 0)
-                    strArgument += s.Substring(s.IndexOf('(') + 1);
+                if (s.IndexOf('(') >= 0)
+                    strArgument += s.Substring(s.IndexOf('('));
                 else
                     strArgument += s + " ";
             }
             return strArgument.Trim();
         }
 
+        /// <summary>
+        /// Checks that the number of parameters supplied to a ParamMethod call is correct.
+        /// </summary>
+        /// <param name="m">The method being called.</param>
+        /// <param name="strArgument">The parameters passed.</param>
+        /// <exception cref="GPLException">Exception thrown if number does not match the expected number of parameters for the given method.</exception>
         private void CheckVariablesSuppliedToMethod(ParamMethod m, string strArgument)
         {
             if (!(m.GetVariableCount() == ExtractParameterNamesFromCSVString(strArgument).Length))
                 throw new GPLException("Incorrect number of parameters passed to Method");
         }
 
+        /// <summary>
+        /// Rebuilds a String array into a single string.
+        /// </summary>
+        /// <param name="parts">String array to be concatenated</param>
+        /// <returns>String</returns>
         private string concatArgument(string[] parts)
         {
             //Compile the remaining arguments into a single string
@@ -325,7 +365,7 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="argsIn"></param>
         /// <returns>Integer List containing the converted values.</returns>
-        public List<int> GetIntArgs(String argsIn)
+        public List<int> GetIntArgs(String argsIn, ParamMethod method = null)
         {
             Validator.validArgs.TryGetValue("var", out Regex var);
             String[] strArgs = argsIn.Split(',');
@@ -334,7 +374,7 @@ namespace GraphicalProgrammingLanguage
             {
                 int i;
                 if (var.IsMatch(s))
-                    i = GetVariableValue(s);
+                    i = GetVariableValue(s, method);
                 else
                     i = Int32.Parse(s);
 
@@ -348,11 +388,16 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="variable">Variable name to be assigned a value.</param> 
         /// <param name="expression">Variable value or expression that results in the value.</param> 
-        public void SetVariableValue(String variable, String[] expression)
+        public void SetVariableValue(String variable, String[] expression, ParamMethod method = null)
         {
-            Variable v = GetVariable(variable);
-            v.SetExpression(expression);
-            v.SetValue();
+            if (method != null)
+                method.SetMethodVariableValue(variable, expression);
+            else
+            {
+                Variable v = GetVariable(variable);
+                v.SetExpression(expression);
+                v.SetValue();
+            }
         }
 
         /// <summary>
@@ -360,9 +405,12 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <param name="variable">Name of the variable to return the value of.</param>
         /// <returns>Value of the named variable.</returns>
-        public int GetVariableValue(String variable)
+        public int GetVariableValue(String variable, ParamMethod method = null)
         {
-            return GetVariable(variable).GetValue();
+            if (method != null)
+                return method.GetVariableValue(variable);
+            else
+                return GetVariable(variable).GetValue();
         }
 
         /// <summary>
@@ -371,9 +419,11 @@ namespace GraphicalProgrammingLanguage
         /// <param name="variable">Name of the variable to return.</param>
         /// <returns>Variable object.</returns>
         /// <exception cref="GPLException">Variable does not exist.</exception>
-        public Variable GetVariable(String variable)
+        public Variable GetVariable(String variable, ParamMethod method = null)
         {
-            if (variables.TryGetValue(variable, out Variable v))
+            if (method != null)
+                return method.GetVariable(variable);
+            else if (variables.TryGetValue(variable, out Variable v))
                 return v;
             else
                 throw new GPLException("Problem getting variable " + variable);
@@ -413,6 +463,11 @@ namespace GraphicalProgrammingLanguage
             return methods.ContainsKey(method);
         }
 
+        /// <summary>
+        /// Takes in a string array containing parts of an expression and replaces any variable names with their value.
+        /// </summary>
+        /// <param name="expression">String array containing expression, e.g. {"one", "+", "one"}</param>
+        /// <returns>String with variable names replaced by values, e.g. "1 + 1"</returns>
         public String GetParsedExpression(String[] expression)
         {
             Validator.validArgs.TryGetValue("var", out Regex var);
@@ -428,30 +483,48 @@ namespace GraphicalProgrammingLanguage
             return parsed;
         }
 
+        /// <summary>
+        /// Checks the condition given to an IF statment.
+        /// </summary>
+        /// <param name="condition">The condition to check, e.g. "1 > 2"</param>
+        /// <returns>Boolean result</returns>
         public bool CheckCondition(String[] condition)
         {
             Expression e = new Expression(condition);
             return e.EvaluateTruth();
         }
 
+        /// <summary>
+        /// Creates a Method or ParamMethod object depending on needs.
+        /// </summary>
+        /// <param name="arg">Argument passed to the 'method' command.</param>
         public void CreateMethod(String arg)
         {
             //If no parameters provided, create Method and return.
             if (arg.IndexOf('(') < 0)
             {
-                methods.Add(arg, new Method());
+                methods.Add(methodName, new Method());
                 return;
             }
 
-            //Otherwise, separate Method name, create ParamMethod and pass variables for creation.
+            //Otherwise create ParamMethod and pass variables for creation.
             ParamMethod m = new ParamMethod();
             m.CreateVariables(ExtractParameterNamesFromCSVString(arg));
-            methods.Add(arg.Substring(0, arg.IndexOf('(')), m);
+            methods.Add(methodName, m);
 
         }
 
+        /// <summary>
+        /// Removes brackets from an argument and splits the values inside at each comma.
+        /// </summary>
+        /// <param name="arg">String containing arguments and brackets e.g. "(one, two, three)"</param>
+        /// <returns>String array of seperated arguments e.g. {"one", " two", " three"}. Note, the strings 
+        /// have preceeding whitespace so will need to be trimmed</returns>
         public String[] ExtractParameterNamesFromCSVString(String arg)
         {
+            if (arg.Equals(String.Empty))
+                return new string[0];
+
             return arg.Substring(arg.IndexOf('(') + 1, arg.IndexOf(')') - (arg.IndexOf('(') + 1)).Split(',');
         }
     }

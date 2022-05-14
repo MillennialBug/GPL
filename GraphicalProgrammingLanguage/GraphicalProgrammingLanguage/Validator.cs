@@ -11,7 +11,7 @@ namespace GraphicalProgrammingLanguage
         public static Regex oneWord = new Regex("^[a-zA-Z]+$");
         public static Regex paramMethod = new Regex("^([a-zA-Z]+)(?:(?:\\([a-zA-Z]+\\))|(?:\\(([a-zA-Z]+)(?:, *[a-zA-Z]+)+\\)))$");
         public static Regex twoArgs = new Regex("^(\\d+|[a-zA-Z]+),(\\d+|[a-zA-Z]+)$");
-        public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s<>]");
+        public static Regex invalidChars = new Regex("[^a-zA-Z\\d\\\\\\+\\*\\-=\\,#\\s<>\\(\\)]");
         public static Regex comparrison = new Regex("[==|>=|<=|>|<]{1}");
         public static Dictionary<String, Regex> validArgs = new Dictionary<String, Regex>() { 
             { "circle",  oneArg }, 
@@ -46,7 +46,7 @@ namespace GraphicalProgrammingLanguage
         /// <param name="variables">A list of variable names.</param>
         /// <param name="methods">A list of method names.</param>
         /// <exception cref="GPLException">Command not found in a List of valid commands or String array length is not 2.</exception>
-        public void ValidateCommand(String[] cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods)
+        public void ValidateCommand(String[] cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods, ParamMethod methodExecuting = null)
         {
             foreach(String s in cmd)
             {

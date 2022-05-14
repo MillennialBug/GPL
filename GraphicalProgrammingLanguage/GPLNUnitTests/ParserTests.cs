@@ -197,6 +197,26 @@ namespace GPLNUnitTests
             {
                 Assert.That(s, Is.EqualTo(String.Empty));
             }
+            Assert.That(parser.MethodExists("mymethod"), Is.True);
+            ParamMethod m = (ParamMethod)parser.GetMethod("mymethod");
+            Assert.That(m.GetVariableValue("one"), Is.EqualTo(1));
+            Assert.That(m.GetVariableValue("two"), Is.EqualTo(2));
+            Assert.That(m.GetVariableValue("three"), Is.EqualTo(3));
+        }
+
+        [TestCase("method mymethod(one, two, three)\ncircle 50\ncircle 75\nendmethod\nmymethod(1, 2)")]
+        [TestCase("method mymethod(one, two)\ncircle 50\ncircle 75\nendmethod\nmymethod(1, 2, 3)")]
+        [TestCase("method mymethod(one)\ncircle 50\ncircle 75\nendmethod\nmymethod")]
+        public void ThrowsExceptionWhenWrongNumberOfParamsSupplied(String program)
+        {
+            //Arrange
+            String[] lines = program.Split('\n');
+
+            //Act
+            String[] exceptions = parser.ParseLines(lines, false);
+
+            //Assert
+            Assert.That(exceptions[4], Is.EqualTo("Incorrect number of parameters passed to Method"));
         }
     }
 }
