@@ -31,8 +31,8 @@ namespace GraphicalProgrammingLanguage
             { "paramMethod", paramMethod }
         };
         public static List<String> shapes = new List<String>() { "circle", "star", "rectangle", "triangle", "square", "polygon"};
-        public static List<String> commands = new List<String>() { "moveto", "drawto", "pen", "fill", "var", "method", "loop", "if"};
-        public static List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod", "endloop", "endif" };
+        public static List<String> commands = new List<String>() { "moveto", "drawto", "pen", "fill", "var", "method", "loop", "if", "while"};
+        public static List<String> singleWordCommands = new List<String>() { "reset", "clear", "endmethod", "endloop", "endif", "endwhile" };
         public static Validator validator = new Validator();
 
         private Validator() { }
@@ -118,13 +118,13 @@ namespace GraphicalProgrammingLanguage
         /// <exception cref="GPLException">Arguments provided do not match the expected format for the command.</exception>
         public void ValidateArgs(String cmd, String[] args)
         {
-            if (cmd.Equals("if"))
+            if (cmd.Equals("if") || cmd.Equals("while"))
             {
                 if (args.Length < 3)
-                    throw new GPLException("'If' conditional incorrectly formatted.");
+                    throw new GPLException("'" + cmd + "' conditional incorrectly formatted.");
 
                 if (!oneArg.IsMatch(args[0]) || !comparrison.IsMatch(args[1]) || !oneArg.IsMatch(args[2]))
-                    throw new GPLException("'If' conditional incorrectly formatted.");
+                    throw new GPLException("'" + cmd + "' conditional incorrectly formatted.");
             }
             else
             {

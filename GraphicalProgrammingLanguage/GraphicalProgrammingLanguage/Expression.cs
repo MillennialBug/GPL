@@ -32,12 +32,12 @@ namespace GraphicalProgrammingLanguage
         {
             Parser parser = Parser.GetParser();
 
-            exp = parser.GetParsedExpression(exp).TrimEnd().Split(' ');
+            String[] parsed = parser.GetParsedExpression(exp).TrimEnd().Split(' ');
 
-            int a = int.Parse(exp[0]);
-            int b = int.Parse(exp[2]);
+            int a = int.Parse(parsed[0]);
+            int b = int.Parse(parsed[2]);
 
-            switch(exp[1])
+            switch(parsed[1])
             {
                 case "==":
                     return a == b;

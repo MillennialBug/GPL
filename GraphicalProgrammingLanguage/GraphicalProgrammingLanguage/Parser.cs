@@ -23,6 +23,7 @@ namespace GraphicalProgrammingLanguage
         Dictionary<String, Variable> variables;
         Dictionary<String, Method> methods;
         Dictionary<Int32, Loop> loops;
+        Dictionary<Int32, While> whiles;
         int loopCount;
         bool methodFlag;
         String methodName;
@@ -30,6 +31,8 @@ namespace GraphicalProgrammingLanguage
         String trimmed;
         bool ifFlag;
         bool executeIf;
+        bool whileFlag;
+        int whileCount;
         private static Parser parser = new Parser();
 
         /// <summary>
@@ -60,12 +63,15 @@ namespace GraphicalProgrammingLanguage
                 variables = new Dictionary<string, Variable>();
                 methods = new Dictionary<string, Method>();
                 loops = new Dictionary<Int32, Loop>();
+                whiles = new Dictionary<int, While>();
                 loopCount = 0;
+                whileCount = 0;
                 exceptionsList = new ExceptionsList();
             }
             
             methodFlag = false;
             loopFlag = false;
+            whileFlag = false;
             ifFlag = false;
             executeIf = false;
 
@@ -150,7 +156,7 @@ namespace GraphicalProgrammingLanguage
                             continue;
                         }
 
-                        if (command.Equals("method") || command.Equals("var"))
+                        if (command.Equals("method") || command.Equals("var") || command.Equals("loop") || command.Equals("while"))
                             throw new GPLException("Command '" + command + "' cannot be used within a method.");
                         else if (methods.TryGetValue(methodName, out Method method))
                         {
@@ -166,8 +172,9 @@ namespace GraphicalProgrammingLanguage
                         {
                             loopFlag = false;
                             exceptionsList.Add(String.Empty);
-                            if (loops.TryGetValue(loopCount, out Loop loop))
+                            if (loops.TryGetValue(loopCount, out Loop loop) && execute)
                             {
+                                loop.EvaluateExecution();
                                 for (int i = 0; i < loop.GetNumberOfLoops(); i++)
                                 {
                                     ParseLines(loop.GetBodyAsArray(), execute, true);
@@ -177,11 +184,38 @@ namespace GraphicalProgrammingLanguage
                             continue;
                         }
 
-                        if (command.Equals("loop") || command.Equals("method") || command.Equals("var"))
+                        if (command.Equals("loop") || command.Equals("method") || command.Equals("var") || command.Equals("while"))
                             throw new GPLException("Command '" + command + "' cannot be used within a loop.");
                         else if(loops.TryGetValue(loopCount, out Loop loop))
                         {
                             loop.AddLine(trimmed);
+                            exceptionsList.Add(String.Empty);
+                            continue;
+                        }
+                    }
+
+                    if (whileFlag)
+                    {
+                        if (command.Equals("endwhile"))
+                        {
+                            whileFlag = false;
+                            exceptionsList.Add(String.Empty);
+                            if (whiles.TryGetValue(whileCount, out While whileloop) && execute)
+                            {
+                                while (whileloop.EvaluateExecution())
+                                {
+                                    parser.ParseLines(whileloop.GetBodyAsArray(), execute, true);
+                                }
+                            }
+                            whileCount++;
+                            continue;
+                        }
+
+                        if (command.Equals("loop") || command.Equals("method") || command.Equals("var") || command.Equals("while"))
+                            throw new GPLException("Command '" + command + "' cannot be used within a while loop.");
+                        else if (whiles.TryGetValue(whileCount, out While whileloop))
+                        {
+                            whileloop.AddLine(trimmed);
                             exceptionsList.Add(String.Empty);
                             continue;
                         }
@@ -279,6 +313,10 @@ namespace GraphicalProgrammingLanguage
                             case "loop":
                                 loops.Add(loopCount, new Loop(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()));
                                 loopFlag = true;
+                                break;
+                            case "while":
+                                whiles.Add(whileCount, new While((new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray())));
+                                whileFlag = true;
                                 break;
                             case "if":
                                 ifFlag = true;

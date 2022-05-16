@@ -73,6 +73,7 @@
     <Compile Include="Star.cs" />
     <Compile Include="Triangle.cs" />
     <Compile Include="Validator.cs" />
+    <Compile Include="While.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
