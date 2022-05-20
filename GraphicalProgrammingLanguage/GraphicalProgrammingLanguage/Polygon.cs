@@ -23,9 +23,13 @@ namespace GraphicalProgrammingLanguage
         /// Takes in a color and a list of integer parameters and sets the internal properties of the class accordingly.
         /// </summary>
         /// <param name="colour"></param>
+        /// <param name="g">Graphics context for the drawing.</param>
+        /// <param name="fill">Boolean determining whether the drawing should be outline or filled.</param>
         /// <param name="parameters"></param>
-        override public void Set(Color colour, params int[] parameters)
+        override public void Set(Color colour, Graphics g, Boolean fill, params int[] parameters)
         {
+            this.g = g;
+            this.fill = fill;
             this.color = colour;
             this.sides = parameters[0];
             this.width = parameters[1];
@@ -53,17 +57,15 @@ namespace GraphicalProgrammingLanguage
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="g">Graphics context for the drawing.</param>
-        /// <param name="fill">Boolean determining whether the drawing should be outline or filled.</param>
-        public override void Draw(Graphics g, Boolean fill)
+        public override void Draw()
         {
-            if (!fill)
+            if (!this.fill)
             {
-                g.DrawPolygon(new Pen(this.color), this.points);
+                this.g.DrawPolygon(new Pen(this.color), this.points);
             }
             else
             {
-                g.FillPolygon(new SolidBrush(this.color), this.points);
+                this.g.FillPolygon(new SolidBrush(this.color), this.points);
             }
             
         }
@@ -73,6 +75,11 @@ namespace GraphicalProgrammingLanguage
         /// </summary>
         /// <returns>Point array of verticies.</returns>
         public Point[] GetPoints() { return this.points; }
+
+        public override void Execute()
+        {
+            Draw();
+        }
 
     }
 }

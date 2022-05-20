@@ -17,7 +17,7 @@ namespace GraphicalProgrammingLanguage
             { "circle",  oneArg }, 
             { "rectangle", twoArgs }, 
             { "fill", new Regex("^on|off$") }, 
-            { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$") },
+            { "pen", new Regex("^#(([\\da-f]{3}){1,2})$|^([a-zA-Z]{3,})$|^[a-zA-Z]+") },
             { "triangle", oneArg },
             { "star", twoArgs },
             { "square", oneArg },

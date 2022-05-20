@@ -18,17 +18,19 @@ namespace GraphicalProgrammingLanguage
 
         public Star() { }
 
-        public override void Set(Color color, params int[] parameters)
+        public override void Set(Color color, Graphics g, Boolean fill, params int[] parameters)
         {
+			this.g = g;
+			this.fill = fill;
 			this.sides = parameters[0];
 			this.color = color;
 			int[] params1 = new int[] { parameters[0], parameters[1], parameters[2], parameters[3] };
 			outer = new Polygon();
-			outer.Set(this.color, params1);
+			outer.Set(this.color, this.g, this.fill, params1);
 			outerPoints = outer.GetPoints();
 			int[] params2 = new int[] { parameters[0], parameters[1] / 2, parameters[2], parameters[3], 1 };
 			inner = new Polygon();
-			inner.Set(this.color, params2);
+			inner.Set(this.color, this.g, this.fill, params2);
 			innerPoints = inner.GetPoints();
 			points = new Point[this.sides*2];
 			/*
@@ -56,16 +58,21 @@ namespace GraphicalProgrammingLanguage
 			}
 		}
 
-        public override void Draw(Graphics g, Boolean fill)
+        public override void Draw()
         {
-            if (!fill)
+            if (!this.fill)
             {
-				g.DrawPolygon(new Pen(this.color), this.points);
+				this.g.DrawPolygon(new Pen(this.color), this.points);
 			}
             else
             {
-				g.FillPolygon(new SolidBrush(this.color), this.points);
+				this.g.FillPolygon(new SolidBrush(this.color), this.points);
             }
+        }
+
+        public override void Execute()
+        {
+			Draw();
         }
     }
 }

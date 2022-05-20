@@ -12,7 +12,7 @@ namespace GraphicalProgrammingLanguage
     public class Parser
     {
         Validator validator;
-        ShapeFactory shapeFactory;
+        CommandFactory commandFactory;
         Canvas canvas;
         ExceptionsList exceptionsList;
         List<int> args;
@@ -42,7 +42,7 @@ namespace GraphicalProgrammingLanguage
         private Parser()
         {
             validator = Validator.GetValidator();
-            shapeFactory = ShapeFactory.GetShapeFactory();
+            commandFactory = CommandFactory.GetShapeFactory();
         }
 
         public static Parser GetParser() { return parser; }
@@ -96,26 +96,27 @@ namespace GraphicalProgrammingLanguage
                 //If there's a bracket in the first part, user should be calling a paramMethod
                 if (parts[0].IndexOf('(') >= 0)
                 {
-                    //Grab the method name.
+                    //Grab the (assumed) method name.
                     command = parts[0].Substring(0, parts[0].IndexOf('('));
                     //Grab the arguments.
                     strArgument = ExtractMethodCallParameters(parts);
                 }
                 else
                 {
-                    //Otherwise, first part should be the command name as it is.
+                    //Otherwise, first part should be a plain command name.
                     command = parts[0];
                     if (command.Equals("method"))
-                        //If we're defining a method, the remaining part of the line should be the name and parameters.
+                        //If we're defining a method, the remaining part of the line should be the name and, optionally, parameters.
                         strArgument = concatArgument(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray());
                     else
                         //Second part of a 2 part command should be the arguments. There should be no spaces provided.
                         strArgument = parts.Length == 2 ? parts[1] : String.Empty;
                 }
                     
-
+                //Time to start deciphering the commands intent.
                 try
-                {                    
+                {       
+                    //Command could be a method name. Methods need to be validated slightly differently as they could have any number of parameters.
                     if (!methods.ContainsKey(command))
                     {
                         if (command.Equals("method"))
@@ -124,13 +125,16 @@ namespace GraphicalProgrammingLanguage
                             validator.ValidateCommand(parts, variables.Keys, methods.Keys);
                     }
                         
+                    //Check if we are in an IF block.
                     if (ifFlag)
                     {
+                        //No nesting allowed. (Would have liked to implement this with more time.)
                         if (command.Equals("method") || command.Equals("var"))
                         {
                             throw new GPLException("Command '" + command + "' cannot be used within an if.");
                         }
 
+                        //End of the if block? Stop executing if we were.
                         if (command.Equals("endif"))
                         {
                             ifFlag = false;
@@ -139,6 +143,8 @@ namespace GraphicalProgrammingLanguage
                             continue;
                         }
 
+                        //If we're not executing, skip the line. 
+                        //TODO: Does this stop syntax errors reporting during writing the code?
                         if (!executeIf)
                         {
                             exceptionsList.Add(String.Empty);
@@ -146,8 +152,10 @@ namespace GraphicalProgrammingLanguage
                         }
                     }
 
+                    //Are we building a method?
                     if (methodFlag)
                     {
+                        //End of the method block. Reset variables and continue with program.
                         if (command.Equals("endmethod"))
                         {
                             methodName = String.Empty;
@@ -156,87 +164,97 @@ namespace GraphicalProgrammingLanguage
                             continue;
                         }
 
+                        //No nesting.
+                        //TODO: Do IFs work when nested in a method?
                         if (command.Equals("method") || command.Equals("var") || command.Equals("loop") || command.Equals("while"))
                             throw new GPLException("Command '" + command + "' cannot be used within a method.");
                         else if (methods.TryGetValue(methodName, out Method method))
                         {
+                            //Otherwise, add line to method body.
                             method.AddLine(trimmed);
                             exceptionsList.Add(String.Empty);
                             continue;
                         }
                     }
 
+                    //Are we building a loop?
                     if (loopFlag)
                     {
+                        //At the end of the loop, begin execution
                         if (command.Equals("endloop"))
                         {
-                            loopFlag = false;
+                            loopFlag = false; //No longer building.
                             exceptionsList.Add(String.Empty);
+
+
                             if (loops.TryGetValue(loopCount, out Loop loop) && execute)
                             {
-                                loop.EvaluateExecution();
-                                for (int i = 0; i < loop.GetNumberOfLoops(); i++)
-                                {
-                                    ParseLines(loop.GetBodyAsArray(), execute, true);
-                                }
+                                loop.Execute();
                             }
-                            loopCount++;
+                            loopCount++; //Ready for the next Loop to be defined.
                             continue;
                         }
 
+                        //No nesting.
+                        //TODO: Do IFs work?
                         if (command.Equals("loop") || command.Equals("method") || command.Equals("var") || command.Equals("while"))
                             throw new GPLException("Command '" + command + "' cannot be used within a loop.");
                         else if(loops.TryGetValue(loopCount, out Loop loop))
                         {
+                            //Otherwise, add line to body of Loop.
                             loop.AddLine(trimmed);
                             exceptionsList.Add(String.Empty);
                             continue;
                         }
                     }
 
+                    //Are we building a WhileLoop?
                     if (whileFlag)
                     {
+                        //End of block. Check if execution is required.
                         if (command.Equals("endwhile"))
                         {
-                            whileFlag = false;
+                            whileFlag = false; //Stop building.
                             exceptionsList.Add(String.Empty);
                             if (whiles.TryGetValue(whileCount, out While whileloop) && execute)
                             {
-                                while (whileloop.EvaluateExecution())
-                                {
-                                    parser.ParseLines(whileloop.GetBodyAsArray(), execute, true);
-                                }
+                                whileloop.Execute();
                             }
-                            whileCount++;
+                            whileCount++; //Ready for next While.
                             continue;
                         }
 
+                        //No nesting.
+                        //TODO: Do IFs work?
                         if (command.Equals("loop") || command.Equals("method") || command.Equals("var") || command.Equals("while"))
                             throw new GPLException("Command '" + command + "' cannot be used within a while loop.");
                         else if (whiles.TryGetValue(whileCount, out While whileloop))
                         {
+                            //Otherwise add line to body.
                             whileloop.AddLine(trimmed);
                             exceptionsList.Add(String.Empty);
                             continue;
                         }
                     }
 
+                    //If the user has called a custom method we need to set up execution.
                     if (MethodExists(command))
                     {
                         Method m = GetMethod(command);
-                        if (m.RequiresVariables())
+                        if (m.RequiresVariables()) //ParamMethods have this set to True
                         {
-                            CheckVariablesSuppliedToMethod((ParamMethod) m, strArgument);
-                            SetMethodVariables((ParamMethod)m, strArgument);
-                            ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod)m);
+                            CheckVariablesSuppliedToMethod((ParamMethod) m, strArgument); //This sense checks number of parameters provided.
+                            SetMethodVariables((ParamMethod)m, strArgument); //This sets the Variables within the Method.
+                            ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod)m); //Execute.
                         }
                         else
-                            ParseLines(m.GetBodyAsArray(), execute, true, (ParamMethod) m);
+                            ParseLines(m.GetBodyAsArray(), execute, true); //Execute regular Method.
 
                         if (!nestedExec) exceptionsList.Add(String.Empty);
                         continue;
                     }
 
+                    //Check for an existing variable name. This means the user is (should) be trying to assign a value to it.
                     if (VariableExists(command))
                     {
                         if (execute) SetVariableValue(command, new ArraySegment<string>(parts, 2, parts.GetLength(0) - 2).ToArray<String>(), methodExecuting);
@@ -244,6 +262,7 @@ namespace GraphicalProgrammingLanguage
                         continue;
                     }
 
+                    //If the command is an existing variable name when the last 2 characters are removed, it could be increment/decrement.
                     if (VariableExists(command.Substring(0,command.Length-2)) || methodExecuting != null)
                     {
                         String name = command.Substring(0, command.Length - 2);
@@ -258,15 +277,16 @@ namespace GraphicalProgrammingLanguage
                         }
                     }
 
-                    if (validator.IsShape(command))
+                    if (validator.IsShape(command)) //Draw a shape!
                     {
                         args = this.GetIntArgs(strArgument, methodExecuting);
-                        if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args[0]);
+                        if (command.Equals("polygon") || command.Equals("star")) validator.ValidatePolygon(command, args[0]); //Polygons and Stars have additional rules.
                         if (command.Equals("square")) args.Add(args[0]); //Adds size of square again so Rectangle can be re-used.
-                        if (execute) canvas.DrawShape(shapeFactory.GetShape(command), args);
+                        if (execute) canvas.DrawShape(commandFactory.GetCommand(command), args);
                     }
                     else
                     {
+                        //User has input a predefined command that is not a shape. Handle accordingly.
                         switch(command) {
                             case "clear":
                                 if (execute) canvas.Clear();
@@ -285,6 +305,7 @@ namespace GraphicalProgrammingLanguage
                             case "pen":
                                 try
                                 {
+                                    //Here we utlisise the ColorTranslator which can take a color name or hex value and return the appropraite color object.
                                     color = ColorTranslator.FromHtml(strArgument);
                                     if (execute) canvas.SetColor(color);
                                 }
@@ -304,22 +325,29 @@ namespace GraphicalProgrammingLanguage
                                 if (execute) canvas.SetFill(strArgument);
                                 break;
                             case "var":
+                                //Creating a variable: Add it to the dictionary.
                                 variables.Add(strArgument, new Variable());
                                 break;
                             case "method":
+                                //Creating a user defined method is a bit complex, so broke this out to it's own method.
                                 CreateMethod(strArgument);
-                                methodFlag = true;
+                                methodFlag = true; //Set the flag to true so subsequent lines are added to the object rather than ran.
                                 break;
+                            //Feel like there's probably a better way to do the 2 types of loop here, as the code is roughly the same,
+                            //but my brain is melted at this point and its the final weekend! MVP time. #We'llFixItDayOne
                             case "loop":
-                                loops.Add(loopCount, new Loop(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()));
-                                loopFlag = true;
+                                loops.Add(loopCount, (Loop) commandFactory.GetCommand(command));//Add a loop at the current list position.
+                                loops[loopCount].set(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray());
+                                loopFlag = true; //Set the flag to true so subsequent lines are added to the object rather than ran.
                                 break;
                             case "while":
-                                whiles.Add(whileCount, new While((new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray())));
-                                whileFlag = true;
+                                whiles.Add(whileCount, (While) commandFactory.GetCommand(command)); // Add a loop at the current list position.
+                                 whiles[whileCount].set(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray());
+                                whileFlag = true; //Set the flag to true so subsequent lines are added to the object rather than ran.
                                 break;
                             case "if":
                                 ifFlag = true;
+                                //No point bothering with the following statements (until endif) if the condition is false
                                 if (CheckCondition(new ArraySegment<String>(parts, 1, parts.Length - 1).ToArray()))
                                     executeIf = true;
                                 break;
@@ -328,7 +356,7 @@ namespace GraphicalProgrammingLanguage
                         }
                     }
 
-                    if(!nestedExec) exceptionsList.Add(String.Empty);
+                    if(!nestedExec) exceptionsList.Add(String.Empty); //If we're nested, adding a line will offset the exceptionBox text, do don't.
 
                 } catch (GPLException e)
                 {

@@ -62,12 +62,13 @@ namespace GraphicalProgrammingLanguage
         /// <param name="args">List of integer values to be passed into the Shape object's Set method. 
         /// Must match order in Shape object's implementation of Set.
         /// xPos and yPos are added to the list in this method before Set is called.</param>
-        public void DrawShape(Shape shape, List<int> args)
+        public void DrawShape(Command command, List<int> args)
         {
+            Shape shape = (Shape)command;
             args.Add(xPos);
             args.Add(yPos);
-            shape.Set(this.color, args.ToArray());
-            shape.Draw(this.g, fill);
+            shape.Set(this.color, this.g, fill, args.ToArray());
+            shape.Execute();
         }
 
         /// <summary>

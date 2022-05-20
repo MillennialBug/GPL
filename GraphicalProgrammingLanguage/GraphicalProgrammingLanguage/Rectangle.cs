@@ -14,8 +14,10 @@ namespace GraphicalProgrammingLanguage
 
         public Rectangle() { }
 
-        override public void Set(Color color, params int[] parameters)
+        override public void Set(Color color, Graphics g, Boolean fill, params int[] parameters)
         {
+            this.g = g;
+            this.fill = fill;
             this.color = color;
             this.width = parameters[0];
             this.height = parameters[1];
@@ -23,16 +25,21 @@ namespace GraphicalProgrammingLanguage
             this.yPos = parameters[3];
         }
 
-        override public void Draw(Graphics g, Boolean fill)
+        override public void Draw()
         {
-            if (!fill)
+            if (!this.fill)
             {
-                g.DrawRectangle(new Pen(this.color), new System.Drawing.Rectangle(this.xPos - (this.width / 2), this.yPos - (this.height / 2), this.width, this.height));
+                this.g.DrawRectangle(new Pen(this.color), new System.Drawing.Rectangle(this.xPos - (this.width / 2), this.yPos - (this.height / 2), this.width, this.height));
             }
             else
             {
-                g.FillRectangle(new SolidBrush(this.color), new System.Drawing.Rectangle(this.xPos - (this.width / 2), this.yPos - (this.height / 2), this.width, this.height));
+                this.g.FillRectangle(new SolidBrush(this.color), new System.Drawing.Rectangle(this.xPos - (this.width / 2), this.yPos - (this.height / 2), this.width, this.height));
             }
+        }
+
+        public override void Execute()
+        {
+            Draw();
         }
     }
 }

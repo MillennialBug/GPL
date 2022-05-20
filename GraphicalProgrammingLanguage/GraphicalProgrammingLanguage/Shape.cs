@@ -7,16 +7,20 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgrammingLanguage
 {
-    abstract public class Shape : ShapeInterface
+    abstract public class Shape : Command
     {
         protected int xPos, yPos;
         protected Color color;
+        protected Graphics g;
+        protected Boolean fill;
 
         public Shape() { }
 
-        abstract public void Set(Color color, params int[] parameters);
+        abstract public void Set(Color color, Graphics g, Boolean fill, params int[] parameters );
 
-        abstract public void Draw(Graphics g, Boolean fill);
+        abstract public void Draw();
+
+        abstract public override void Execute();
 
     }
 }

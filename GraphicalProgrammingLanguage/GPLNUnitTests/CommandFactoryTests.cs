@@ -5,40 +5,40 @@ using System.Collections.Generic;
 
 namespace GPLNUnitTests
 {
-    public class ShapeFactoryTests
+    public class CommandFactoryTests
     {
-        ShapeFactory shapeFactory = ShapeFactory.GetShapeFactory();
+        CommandFactory commandFactory = CommandFactory.GetShapeFactory();
 
-        [Test, TestCaseSource("GetShapeCreationTestCases")]
-        public void ShapeFactory_CreatesCorrectShape(string name, Type type)
+        [Test, TestCaseSource("GetCommandCreationTestCases")]
+        public void CommandFactory_CreatesCorrectCommand(string name, Type type)
         {
             //Act
-            Shape shape = shapeFactory.GetShape(name);
+            Command command = commandFactory.GetCommand(name);
 
             //Assert
-            Assert.That(shape, Is.TypeOf(type));
+            Assert.That(command, Is.TypeOf(type));
         }
 
         [Test]
-        public void ShapeFactory_ThrowsException_IncorrectShapeName()
+        public void CommandFactory_ThrowsException_IncorrectCommandName()
         {
             //Arrange
             String name = "invalid";
             //Act
             try
             {
-                Shape shape = shapeFactory.GetShape(name);
+                Command command = commandFactory.GetCommand(name);
             }
             catch (GPLException e)
             {
-                Assert.That(e.Message, Is.EqualTo("Shape '" + name + "' not found."));
+                Assert.That(e.Message, Is.EqualTo("Command '" + name + "' not found."));
                 return;
             }
 
             Assert.Fail();
         }
 
-        private static IEnumerable<TestCaseData> GetShapeCreationTestCases()
+        private static IEnumerable<TestCaseData> GetCommandCreationTestCases()
         {
             yield return new TestCaseData("circle", typeof(Circle));
             yield return new TestCaseData("rectangle", typeof(Rectangle));
@@ -46,6 +46,8 @@ namespace GPLNUnitTests
             yield return new TestCaseData("triangle", typeof(Triangle));
             yield return new TestCaseData("polygon", typeof(Polygon));
             yield return new TestCaseData("star", typeof(Star));
+            yield return new TestCaseData("loop", typeof(Loop));
+            yield return new TestCaseData("while", typeof(While));
         }
     }
 }

@@ -13,25 +13,31 @@ namespace GraphicalProgrammingLanguage
 
         public Circle() { }
 
-        override public void Set(Color color, params int[] parameters)
+        override public void Set(Color color, Graphics g, Boolean fill, params int[] parameters)
         {
+            this.g = g;
+            this.fill = fill;
             this.color = color;
             this.diameter = parameters[0];
             this.xPos = parameters[1];
             this.yPos = parameters[2];
         }
 
-        override public void Draw(Graphics g, Boolean fill)
+        override public void Draw()
         {
-            if (!fill)
+            if (!this.fill)
             {
-                g.DrawEllipse(new Pen(this.color), new System.Drawing.Rectangle(this.xPos - (this.diameter / 2), this.yPos - (this.diameter / 2), this.diameter, this.diameter));
+                this.g.DrawEllipse(new Pen(this.color), new System.Drawing.Rectangle(this.xPos - (this.diameter / 2), this.yPos - (this.diameter / 2), this.diameter, this.diameter));
             }
             else
             {
-                g.FillEllipse(new SolidBrush(this.color), new System.Drawing.Rectangle(this.xPos - (this.diameter / 2), this.yPos - (this.diameter / 2), this.diameter, this.diameter));
+                this.g.FillEllipse(new SolidBrush(this.color), new System.Drawing.Rectangle(this.xPos - (this.diameter / 2), this.yPos - (this.diameter / 2), this.diameter, this.diameter));
             }
-            
+        }
+
+        public override void Execute()
+        {
+            Draw();
         }
     }
 }
