@@ -5,10 +5,18 @@ using System.Collections.Generic;
 
 namespace GPLNUnitTests
 {
+    /// <summary>
+    /// Test Class containing tests that related to functionality within the CommandFactory class.
+    /// </summary>
     public class CommandFactoryTests
     {
         CommandFactory commandFactory = CommandFactory.GetShapeFactory();
 
+        /// <summary>
+        /// Checks that when given a valid Command name as a parameter, the CommandFactroy.GetCommand method returns the correct Command object.
+        /// </summary>
+        /// <param name="name">Valid Command name.</param>
+        /// <param name="type">Expected type of the returned Command object.</param>
         [Test, TestCaseSource("GetCommandCreationTestCases")]
         public void CommandFactory_CreatesCorrectCommand(string name, Type type)
         {
@@ -19,6 +27,9 @@ namespace GPLNUnitTests
             Assert.That(command, Is.TypeOf(type));
         }
 
+        /// <summary>
+        /// Checks that the CommandFactroy.GetCommand method throws an exception when passed an invalid Command name.
+        /// </summary>
         [Test]
         public void CommandFactory_ThrowsException_IncorrectCommandName()
         {

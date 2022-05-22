@@ -14,6 +14,13 @@ namespace GraphicalProgrammingLanguage
 
         public Rectangle() { }
 
+        /// <summary>
+        /// Takes in a color and a list of integer parameters and sets the internal properties of the class accordingly.
+        /// </summary>
+        /// <param name="colour">The Color in which to Draw the Shape.</param>
+        /// <param name="g">Graphics context for the drawing.</param>
+        /// <param name="fill">Boolean determining whether the drawing should be outline or filled.</param>
+        /// <param name="parameters">An int array which must contain Width, Height, X Co-ord, Y Co-ord for the Shape in that order.</param>
         override public void Set(Color color, Graphics g, Boolean fill, params int[] parameters)
         {
             this.g = g;
@@ -25,6 +32,9 @@ namespace GraphicalProgrammingLanguage
             this.yPos = parameters[3];
         }
 
+        /// <summary>
+        /// Draws the shape at the specified location and with the given measurements and fill status.
+        /// </summary>
         override public void Draw()
         {
             if (!this.fill)

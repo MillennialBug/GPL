@@ -5,6 +5,9 @@ using NUnit.Framework;
 
 namespace GPLNUnitTests
 {
+    /// <summary>
+    /// Test Class that checks functionality of the Parser Class.
+    /// </summary>
     internal class ParserTests
     {
         private Parser parser;
@@ -12,6 +15,9 @@ namespace GPLNUnitTests
         String[] multiPartProgramline;
         string[] exceptions;
 
+        /// <summary>
+        /// Sets objects that are used throughout the tests.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -137,6 +143,9 @@ namespace GPLNUnitTests
             Assert.That(b.GetValue(), Is.EqualTo(0));
         }
 
+        /// <summary>
+        /// Checks that the increment command (++) adds 1 to a Variable's value.
+        /// </summary>
         [Test]
         public void IncrementAddsOneToVariable()
         {
@@ -150,6 +159,9 @@ namespace GPLNUnitTests
             Assert.That(a.GetValue, Is.EqualTo(2));
         }
 
+        /// <summary>
+        /// Checks that the decrement command (--) takes 1 from a Variable's value.
+        /// </summary>
         [Test]
         public void DecrementTakesOneFromVariable()
         {
@@ -163,6 +175,9 @@ namespace GPLNUnitTests
             Assert.That(a.GetValue, Is.EqualTo(1));
         }
 
+        /// <summary>
+        /// Checks that the Parser correctly creates a ParamMethod, including the specified Variables.
+        /// </summary>
         [Test]
         public void ParsesParamMethod()
         {
@@ -183,6 +198,9 @@ namespace GPLNUnitTests
             Assert.That(m.HasVariable("three"), Is.True);
         }
 
+        /// <summary>
+        /// Checks that a ParamMethod executes successfully when passed the correct number of parameters, although those parameters are never used in the Method.
+        /// </summary>
         [Test]
         public void ExecutesParamMethodNoParamsUsed()
         {
@@ -204,6 +222,10 @@ namespace GPLNUnitTests
             Assert.That(m.GetVariableValue("three"), Is.EqualTo(3));
         }
 
+        /// <summary>
+        /// Checks that an exception is thrown when an incorrect number of parameters are passed to a ParamMethod.
+        /// </summary>
+        /// <param name="program"></param>
         [TestCase("method mymethod(one, two, three)\ncircle 50\ncircle 75\nendmethod\nmymethod(1, 2)")]
         [TestCase("method mymethod(one, two)\ncircle 50\ncircle 75\nendmethod\nmymethod(1, 2, 3)")]
         [TestCase("method mymethod(one)\ncircle 50\ncircle 75\nendmethod\nmymethod")]

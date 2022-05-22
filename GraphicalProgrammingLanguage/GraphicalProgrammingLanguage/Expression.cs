@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace GraphicalProgrammingLanguage
 {
+    /// <summary>
+    /// Class used to hold and evaluate the value of an expression for either value or truth.
+    /// </summary>
     public class Expression
     {
         String[] exp;
@@ -12,6 +15,10 @@ namespace GraphicalProgrammingLanguage
             this.exp = exp;
         }
 
+        /// <summary>
+        /// Evaluates an expression and returns an int value.
+        /// </summary>
+        /// <returns>Integer result of the expression.</returns>
         public int EvaluateValue()
         {
             Parser parser = Parser.GetParser();
@@ -28,6 +35,10 @@ namespace GraphicalProgrammingLanguage
             return Int32.Parse(dt.Compute(parser.GetParsedExpression(exp), "").ToString());
         }
 
+        /// <summary>
+        /// Evaluates an expression and returns a bool value.
+        /// </summary>
+        /// <returns>Boolean result of the expression.</returns>
         public bool EvaluateTruth()
         {
             Parser parser = Parser.GetParser();

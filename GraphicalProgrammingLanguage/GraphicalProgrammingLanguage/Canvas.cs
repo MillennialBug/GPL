@@ -26,18 +26,26 @@ namespace GraphicalProgrammingLanguage
         private static Canvas canvas = new Canvas();
 
         /// <summary>
-        /// Constructor for Canvas taking a single argument. Also sets default color and default pen.
+        /// Constructor for Canvas. Sets default color and default pen.
         /// </summary>
-        /// <param name="g">Graphics context for drawing to.</param>
         private Canvas()
         {
             this.color = Color.Black;
             this.pen = new Pen(this.color);
         }
 
+        /// <summary>
+        /// Returns the static Canvas instance.
+        /// </summary>
+        /// <returns></returns>
         public static Canvas GetCanvas() { return canvas; }
 
+        /// <summary>
+        /// Sets the Graphics context for this Canvas object.
+        /// </summary>
+        /// <param name="g">Graphics context for the Canvas.</param>
         public void SetGraphics(Graphics g) { this.g = g; }
+
         /// <summary>
         /// Returns the Canvas' Graphics context so it can be used by other Classes if necessary.
         /// </summary>

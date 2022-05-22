@@ -5,6 +5,9 @@ using NUnit.Framework;
 
 namespace GPLNUnitTests
 {
+    /// <summary>
+    /// A Test Class to check funcionality within the Validator Class.
+    /// </summary>
     internal class ValidatorTests
     {
         Validator validator;
@@ -15,6 +18,9 @@ namespace GPLNUnitTests
         String[] singleWordCommand;
         String[] multiPartProgramline;
 
+        /// <summary>
+        /// Sets objects ready for use in the tests.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -272,6 +278,9 @@ namespace GPLNUnitTests
             Assert.Fail();
         }
 
+        /// <summary>
+        /// Checks that the Validator.ValidateMethod method is able to correctly grab a ParamMethod name.
+        /// </summary>
         [Test]
         public void ValidatesParamMethodCommand()
         {
@@ -296,6 +305,10 @@ namespace GPLNUnitTests
                 Assert.Fail();
         }
 
+        /// <summary>
+        /// Checks that Validator.ValidateCommand is able to correctly validate an increment or decrement command.
+        /// </summary>
+        /// <param name="s"></param>
         [TestCase("two++")]
         [TestCase("two--")]
         public void ValidatesIncrementOrDecrementCommand(String s)

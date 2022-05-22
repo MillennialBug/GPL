@@ -5,6 +5,10 @@ using System.Text.RegularExpressions;
 
 namespace GraphicalProgrammingLanguage
 {
+    /// <summary>
+    /// Singleton Pattern.
+    /// Class used to validate (mostly) the format of a given command string.
+    /// </summary>
     public class Validator
     {
         public static Regex oneArg = new Regex("^(\\d+|[a-zA-Z]+)$");
@@ -37,6 +41,10 @@ namespace GraphicalProgrammingLanguage
 
         private Validator() { }
 
+        /// <summary>
+        /// Returns the Validator instance.
+        /// </summary>
+        /// <returns></returns>
         public static Validator GetValidator() { return validator; }
 
         /// <summary>
@@ -45,7 +53,8 @@ namespace GraphicalProgrammingLanguage
         /// <param name="cmd">String array containing a potential command word in [0] and a set of potential arguments in [1].</param>
         /// <param name="variables">A list of variable names.</param>
         /// <param name="methods">A list of method names.</param>
-        /// <exception cref="GPLException">Command not found in a List of valid commands or String array length is not 2.</exception>
+        /// <param name="methodExecuting">ParamMethod being executed, or null by default. Used to check for the correct variables.</param>
+        /// <exception cref="GPLException">Thows exceptions for invalid commands for a number of reasons.</exception>
         public void ValidateCommand(String[] cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods, ParamMethod methodExecuting = null)
         {
             foreach(String s in cmd)
@@ -90,11 +99,11 @@ namespace GraphicalProgrammingLanguage
         }
 
         /// <summary>
-        /// 
+        /// Validates a command for setting a variable value.
         /// </summary>
-        /// <param name="args"></param>
-        /// <param name="variables"></param>
-        /// <exception cref="GPLException"></exception>
+        /// <param name="cmd">Variable assingment command in a String array E.G. {"one","=","1","+","zero"}</param>
+        /// <param name="variables">Dictionary collection of variables. Used to validate named variable exists.</param>
+        /// <exception cref="GPLException">Throws exception if a named variable does not exist.</exception>
         public void ValidateVariableAssignment(String[] cmd, Dictionary<String, Variable>.KeyCollection variables)
         {
             if(validArgs.TryGetValue("math", out Regex math) && validArgs.TryGetValue("var", out Regex var))
@@ -155,6 +164,14 @@ namespace GraphicalProgrammingLanguage
             return shapes.Contains(cmd);
         }
 
+        /// <summary>
+        /// Validates method creation commands.
+        /// </summary>
+        /// <param name="cmd">Command line for creating a Method or ParamMethod.</param>
+        /// <param name="variables">Dictionary collection of Variables.</param>
+        /// <param name="methods">Dictionary collection of Methods.</param>
+        /// <returns>String with the value of the method name being created.</returns>
+        /// <exception cref="GPLException">Throws an exception if the method already exists or if the name is the same as an existing Variable or Command.</exception>
         public String ValidateMethod(String cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods)
         {
             String methodName;

@@ -18,7 +18,15 @@ namespace GraphicalProgrammingLanguage
 
         public Star() { }
 
-        public override void Set(Color color, Graphics g, Boolean fill, params int[] parameters)
+		/// <summary>
+		/// Takes in a color and a list of integer parameters and sets the internal properties of the class accordingly.
+		/// For Star, this creates 2 Polygon objects which are used to calculate how to draw the Star shape.
+		/// </summary>
+		/// <param name="colour">The Color in which to Draw the Shape.</param>
+		/// <param name="g">Graphics context for the drawing.</param>
+		/// <param name="fill">Boolean determining whether the drawing should be outline or filled.</param>
+		/// <param name="parameters">An int array which must contain Number of Points, Width, X Co-ord, Y Co-ord for the Shape in that order.</param>
+		public override void Set(Color color, Graphics g, Boolean fill, params int[] parameters)
         {
 			this.g = g;
 			this.fill = fill;
@@ -58,7 +66,10 @@ namespace GraphicalProgrammingLanguage
 			}
 		}
 
-        public override void Draw()
+		/// <summary>
+		/// Draws the shape at the specified location and with the given measurements and fill status.
+		/// </summary>
+		public override void Draw()
         {
             if (!this.fill)
             {

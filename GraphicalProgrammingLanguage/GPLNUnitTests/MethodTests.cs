@@ -3,8 +3,14 @@ using GraphicalProgrammingLanguage;
 
 namespace GPLNUnitTests
 {
+    /// <summary>
+    /// Test Class that checks functionality within the Method Class.
+    /// </summary>
     public class MethodTests
     {
+        /// <summary>
+        /// Checks that Method.GetBodyAsArray() returns the correct contents.
+        /// </summary>
         [Test]
         public void MethodObject_ReturnsBodyAsArray()
         {

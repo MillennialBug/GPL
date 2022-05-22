@@ -36,9 +36,8 @@ namespace GraphicalProgrammingLanguage
         private static Parser parser = new Parser();
 
         /// <summary>
-        /// Constructor taking a single parameter, a reference to a Canvas object.
+        /// Constructor. Gets the Validator and CommandFactory instances.
         /// </summary>
-        /// <param name="c">Canvas object</param>
         private Parser()
         {
             validator = Validator.GetValidator();
@@ -47,6 +46,10 @@ namespace GraphicalProgrammingLanguage
 
         public static Parser GetParser() { return parser; }
 
+        /// <summary>
+        /// Simply sets the Canvas object reference.
+        /// </summary>
+        /// <param name="canvas">Canvas object.</param>
         public void SetCanvas(Canvas canvas) { this.canvas = canvas; }
 
         /// <summary>
@@ -55,6 +58,7 @@ namespace GraphicalProgrammingLanguage
         /// <param name="lines">String array containing user entered commands.</param>
         /// <param name="execute">Boolean determining if the commands should be executed (True), or just validated (False).</param>
         /// <param name="nestedExec">Boolean to determine if execution is nested. This stops lists being destroyed. Default False.</param>
+        /// <param name="methodExecuting">A ParamMethod object, if it is currently being parsed. This is used so the correct variables can be accessed.</param>
         /// <returns>String array holding any exceptions caused by the user inputted commands.</returns>
         public String[] ParseLines(String[] lines, Boolean execute, Boolean nestedExec = false, ParamMethod methodExecuting = null)
         {
