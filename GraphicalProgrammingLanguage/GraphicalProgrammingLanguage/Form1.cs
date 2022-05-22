@@ -16,6 +16,9 @@ namespace GraphicalProgrammingLanguage
         Canvas paintingCanvas;
         Parser parser;
 
+        /// <summary>
+        /// Constructor. Initializes component. Gets Singleton Canvas and Parser instances. Sets Graphics context for Canvas.
+        /// </summary>
         public Form1()
         {
             InitializeComponent();
@@ -25,6 +28,13 @@ namespace GraphicalProgrammingLanguage
             parser.SetCanvas(paintingCanvas);
         }
 
+        /// <summary>
+        /// Runs a program entered into the ProgramBox.
+        /// First resets canvas to default settings. I.E. Pen black, 0,0 cursor co-ords and blank Canvas.
+        /// Also checks for errors in program first and does not execute if any are found.
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void RunButton_Click(object sender, EventArgs e)
         {
             paintingCanvas.RestoreDefaultState();
@@ -36,12 +46,24 @@ namespace GraphicalProgrammingLanguage
             Refresh();
         }
 
+        /// <summary>
+        /// Paints the contents of the paintingBitmap onto the Canvas.
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void PictureBox_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             g.DrawImageUnscaled(paintingBitmap, 0, 0);
         }
 
+        /// <summary>
+        /// Listens for a keyboard key press when in the single line command box, specifically checking for Enter key.
+        /// Runs the main programBox program if 'run' command is entered into the command box, 
+        /// otherwise runs the single line command.
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void CommandBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -59,6 +81,11 @@ namespace GraphicalProgrammingLanguage
             
         }
 
+        /// <summary>
+        /// Listening for a Keyboard key in the programBox. If Enter key is pressed, the entire program is checked for errors.
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void ProgramBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -67,6 +94,11 @@ namespace GraphicalProgrammingLanguage
             }
         }
 
+        /// <summary>
+        /// Loads a file into the programBox.
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void LoadButton_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -83,6 +115,11 @@ namespace GraphicalProgrammingLanguage
             Refresh();
         }
 
+        /// <summary>
+        /// Saves a program entered into the programBox.
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void SaveButton_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -98,6 +135,11 @@ namespace GraphicalProgrammingLanguage
             }
         }
 
+        /// <summary>
+        /// Clears the programBox and the Canvas. Also runs the clear and reset commands (Essentially resets the program to it's default state).
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void ClearButton_Click(object sender, EventArgs e)
         {
             DialogResult res = MessageBox.Show("This will clear the program window and Canvas.\nContinue?", "Are you sure?", MessageBoxButtons.YesNo);
@@ -110,6 +152,11 @@ namespace GraphicalProgrammingLanguage
             }  
         }
 
+        /// <summary>
+        /// Checks the program entered into programBox for errors. Pretty much redundant as line-by-line checking is available.
+        /// </summary>
+        /// <param name="sender">Object that sent to event</param>
+        /// <param name="e">Event args</param>
         private void CheckButton_Click(object sender, EventArgs e)
         {
             //Check code for errors
@@ -118,6 +165,9 @@ namespace GraphicalProgrammingLanguage
             Refresh();
         }
 
+        /// <summary>
+        /// Loops through the lines in the exceptionBox to determine if any errors are present. Returns true if there is.
+        /// </summary>
         private void CheckProgramIsClean()
         {
             cleanProgram = true;
@@ -127,11 +177,21 @@ namespace GraphicalProgrammingLanguage
             }
         }
 
+        /// <summary>
+        /// Menu item that just calls the SaveButton_Click method.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveButton_Click(sender, e);
         }
 
+        /// <summary>
+        /// Menu item that just calls the LoadButton_Click method.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadButton_Click(sender, e);
