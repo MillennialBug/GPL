@@ -299,11 +299,11 @@ namespace GraphicalProgrammingLanguage
                                 if (execute) canvas.Reset();
                                 break;
                             case "moveto":
-                                args = this.GetIntArgs(strArgument);
+                                args = this.GetIntArgs(strArgument, methodExecuting);
                                 if (execute) canvas.MoveCursor(args);
                                 break;
                             case "drawto":
-                                args = this.GetIntArgs(strArgument);
+                                args = this.GetIntArgs(strArgument, methodExecuting);
                                 if (execute) canvas.DrawLine(args);
                                 break;
                             case "pen":

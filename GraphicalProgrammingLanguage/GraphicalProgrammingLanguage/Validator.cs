@@ -57,20 +57,34 @@ namespace GraphicalProgrammingLanguage
         /// <exception cref="GPLException">Thows exceptions for invalid commands for a number of reasons.</exception>
         public void ValidateCommand(String[] cmd, Dictionary<String, Variable>.KeyCollection variables, Dictionary<String, Method>.KeyCollection methods, ParamMethod methodExecuting = null)
         {
+            //Check no invalid characters are present.
             foreach(String s in cmd)
             {
                 if (invalidChars.IsMatch(s))
                     throw new GPLException("Invalid character found in command.");
             }
-                
+               
+            // If the first word in the command anything other than a shape, command, method or variable, it's incorrect.
             if (!shapes.Contains(cmd[0]) && !commands.Contains(cmd[0]) && !singleWordCommands.Contains(cmd[0]) && !methods.Contains(cmd[0]) && !variables.Contains(cmd[0]))
             {
-                String variableName = cmd[0].Substring(0, cmd[0].Length - 2);
-                String op = cmd[0].Substring(cmd[0].Length - 2, 2);
-                if (!(variables.Contains(variableName) && (op.Equals("++") || op.Equals("--"))))
+                //Final check because it could be a variable name with ++ or -- on the end
+                if(cmd[0].Length > 2)
+                {
+                    String variableName = cmd[0].Substring(0, cmd[0].Length - 2);
+                    String op = cmd[0].Substring(cmd[0].Length - 2, 2);
+
+                    //If it isn't increment or decrement, it's a bad command.
+                    if (!(variables.Contains(variableName) && (op.Equals("++") || op.Equals("--"))))
+                        throw new GPLException("Bad command found: " + cmd[0]);
+                    else
+                        return;
+                }
+                else
+                {
                     throw new GPLException("Bad command found: " + cmd[0]);
-                else 
-                    return;
+                }
+                
+                
             }
 
             // Only single word lines should be reset, clear, endmethod or defined methods.

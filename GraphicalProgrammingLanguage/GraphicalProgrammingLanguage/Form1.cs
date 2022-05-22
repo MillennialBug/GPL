@@ -147,7 +147,7 @@ namespace GraphicalProgrammingLanguage
             {
                 programBox.Clear();
                 exceptionBox.Clear();
-                parser.ParseLines("clear\nreset".Split('\n'), true);
+                paintingCanvas.RestoreDefaultState();
                 Refresh();
             }  
         }

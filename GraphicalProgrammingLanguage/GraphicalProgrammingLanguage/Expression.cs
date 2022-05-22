@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GraphicalProgrammingLanguage
 {
     /// <summary>
-    /// Class used to hold and evaluate the value of an expression for either value or truth.
+    /// Class used to hold and evaluate the value of an expression, and evaluate it for either value or truth.
     /// </summary>
     public class Expression
     {

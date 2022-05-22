@@ -121,7 +121,7 @@ namespace GPLNUnitTests
         /// <summary>
         /// Tests that a command that requires arguments throws an exception when no args provided.
         /// </summary>
-        /// <param name="s"></param>
+        /// <param name="s">Command to be tested.</param>
         [TestCaseSource(nameof(InvalidSingleWordCommandCases))]
         [TestCaseSource(nameof(ShapeCommandWordCases))]
         public void ValidCommandRequiringArgsNoArgs(String s)
